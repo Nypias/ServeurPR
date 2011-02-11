@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<html class=" js flexbox canvas canvastext webgl no-touch geolocation postmessage no-websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity no-cssanimations csscolumns cssgradients no-cssreflections csstransforms no-csstransforms3d csstransitions fontface video audio localstorage sessionstorage webworkers applicationcache svg inlinesvg smil svgclippaths" lang="en"><!--<![endif]--><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"><style type="text/css"></style>
+  <meta charset="utf-8">
+
+  <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+       Remove this if you use the .htaccess -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>WebSocket.org | Echo Test</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--  Mobile viewport optimized: j.mp/bplateviewport -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Place favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
+  <link rel="shortcut icon" type="image/png" href="http://websocket.org/img/favicon.png">
+
+  <!-- CSS : implied media="all" -->
+  <link rel="stylesheet" href="echo_fichiers/style.css">
+
+  <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
+  <script src="echo_fichiers/ga.js" async="" type="text/javascript"></script><script src="echo_fichiers/modernizr-1.js"></script>
+
+  <!-- For navbar menu -->
+  <!--[if lte IE 7]>
+  <style type="text/css">
+  #menu ul {display:inline;}
+  #ntl-menu ul {filter: alpha(opacity=95); filter: progid:DXImageTransform.Microsoft.Alpha(opacity=95);}
+  </style>
+  <![endif]-->
+
+  <!-- Google analytics -->
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1771436-4']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+</head>
+
+<body>
+
+  <div id="container">
+
+    <div id="top">
+
+      <div id="top-logo">
+        <a href="http://websocket.org/index.html"><img class="imgWithTextVerticalCentered" src="echo_fichiers/logo-top2.png" alt="WebSocket.org Logo" height="70" width="70"></a>
+      </div>
+      <div id="top-heading">
+        <a href="http://websocket.org/index.html"><span class="websiteHeading1">WebSocket.org</span><br><small id="top-heading-byline">Are you plugged in?</small></a>
+      </div>
+
+      <div id="top-compat-box">
+        <p>Does your browser<br>support WebSocket?</p>
+        <div id="top-compat-info-box">
+          <div id="top-compat-info">
+            <span id="browserType">Firefox 4</span><br>
+            <span id="platform">Windows</span>
+          </div>
+          <div id="top-compat-image">
+            <a href="http://websocket.org/echo.html"><img src="echo_fichiers/check.png" id="wsSupportImg" alt="" border="0" height="25" width="25"></a>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="clearfix"></div>
+
+    <div id="nav-top">
+<ul id="ntl-menu">
+
+	<li class="liTop first single"><a class="top" href="http://websocket.org/index.html">Home</a></li>
+
+	<li class="liTop"><a class="top" href="http://websocket.org/demos.html">Demos<!--[if gte IE 7]><!--></a><!--<![endif]-->
+	<!--[if lte IE 6]><table><tr><td nowrap><![endif]-->
+		<ul class="ul-l1">
+
+			<li><a href="http://websocket.org/echo.html">Echo Test</a></li>
+			<li><a href="http://websocket.org/demos.html">Demos on the Web</a></li>
+		</ul>
+
+	<!--[if lte IE 6]></td></tr></table></a><![endif]-->
+	</li>
+
+	<li class="liTop single"><a class="top" href="http://websocket.org/aboutwebsocket.html">All About WebSocket</a></li>
+
+	<li class="liTop single last"><a class="top" href="http://websocket.org/quantum.html">Benefits of WebSocket</a></li>
+
+</ul>
+
+    <div id="nav-sponsor">
+      This website powered by <a href="http://kaazing.com/"><img src="echo_fichiers/nav-sponsor.png" alt="Kaazing Logo" height="15" width="93"></a>
+    </div>
+
+    </div> <!-- #top -->
+
+    <div class="clearfix"></div>
+
+    <br>
+
+    <script type="text/javascript" src="echo_fichiers/stuff.js"></script>
+		<script language="javascript" type="text/javascript">
+
+      function browserDetect()
+      {
+        document.getElementById("browserType").innerHTML = BrowserDetect.browser + ' ' + BrowserDetect.version;
+        document.getElementById("platform").innerHTML = BrowserDetect.OS;
+
+        if (window.WebSocket)
+        {
+          document.getElementById("wsSupportImg").src = "img/check.png"
+        }
+        else
+        {
+          document.getElementById("wsSupportImg").src = "img/cross.png"
+        }
+      }
+
+		  // Handle difference for IE.
+      if (window.attachEvent)
+			{
+        window.attachEvent("load", browserDetect)
+			}
+			else
+			{
+        window.addEventListener("load", browserDetect, false);
+			}
+
+    </script>
+
+    <nav>
+
+      <h2>Links</h2>
+
+      <a href="http://websocket.org/index.html">Home</a><br>
+      <a href="http://websocket.org/demos.html">Demos</a><br>
+      <a href="http://websocket.org/echo.html" class="subLink">Echo Test</a><br>
+      <a href="http://websocket.org/demos.html" class="subLink">Demos on the Web</a><br>
+      <a href="http://websocket.org/aboutwebsocket.html">All About WebSocket</a><br>
+      <a href="http://websocket.org/quantum.html">Benefits of WebSocket</a><br>
+      <br>
+      <a href="http://dev.w3.org/html5/websockets/">WebSocket API</a><br>
+      <a href="http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-03">WebSocket Protocol</a><br>
+
+    </nav>
+
+    <div id="main-container">
+
+      <!--
+      <header>
+        This is the header.
+      </header>
+      -->
+
+      <div id="main">
+
+        <h1>Echo Test</h1>
+        <p class="bodytext">The first section of this page will let you
+do an HTML5 WebSocket test against the echo server. The second section
+walks you creating a WebSocket yourself.</p>
+
+        <h2>Try it out</h2>
+
+        <div style="display: block;" id="webSocketSupp">
+          <div style="float: left;">
+            <img src="echo_fichiers/check.png" align="absmiddle" height="36" width="36">
+          </div>
+          <div style="float: left; width: 600px; margin-left: 10px; position:relative; top: 8px;">
+            This browser supports WebSocket.
+          </div>
+          <div class="clearfix"></div>
+        </div>
+
+        <div id="noWebSocketSupp">
+          <div style="float: left;">
+            <img src="echo_fichiers/cross.png" align="absmiddle" height="36" width="36">
+          </div>
+          <div style="float: left; width: 600px; margin-left: 10px;">
+            <p>Uh-oh, the browser you're using doesn't have native support for WebSocket. That means you can't run this demo.</p>
+            <p>The following link lists the browsers that support WebSocket:</p>
+            <p><a href="http://caniuse.com/#feat=websockets">http://caniuse.com/#feat=websockets</a></p>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+
+        <div id="echo">
+          <div id="echo-config" style="float: left;">
+            <strong>Location:</strong><br>
+            <input value="ws://localhost:8080/test" id="wsUri" size="35">
+            <br>
+            <input id="secureCb" onclick="toggleTls();" type="checkbox">
+            <span id="secureCbLabel" style="font-size: smaller; color: black;">Use secure WebSocket (TLS)</span><br>
+            <button id="connect">Connect</button>
+            <button disabled="disabled" id="disconnect">Disconnect</button>
+            <br>
+            <br>
+            <strong>Message:</strong><br>
+            <input disabled="disabled" id="sendMessage" size="35" value="Rock it with HTML5 WebSocket">
+            <br>
+            <button disabled="disabled" id="send" class="wsButton">Send</button>
+          </div>
+          <div id="echo-log" style="float: left; margin-left: 20px; padding-left: 20px; width: 350px; border-left: solid 1px #cccccc;"> <strong>Log:</strong>
+            <div id="consoleLog"></div>
+            <button id="clearLogBut" style="position: relative; top: 3px;">Clear log</button>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+
+        <p><br><strong>Instructions:</strong></p>
+        <table class="instructions" cellpadding="2px" cellspacing="0px">
+          <tbody><tr>
+            <td nowrap="nowrap" valign="top">Step 1: &nbsp;</td>
+            <td valign="top">Press the <strong>Connect</strong> button.</td>
+          </tr>
+          <tr>
+            <td nowrap="nowrap" valign="top">Step 2: &nbsp;</td>
+            <td valign="top">Once connected, enter a message and press the <strong>Send</strong> button. The output will appear in the <strong>Log</strong> section. You can change the message and send again multiple times. </td>
+          </tr>
+          <tr>
+            <td nowrap="nowrap" valign="top">Step 3: &nbsp;</td>
+            <td valign="top">Press the <strong>Disconnect</strong> button.</td>
+          </tr>
+          <tr>
+            <td nowrap="nowrap" valign="top">Note: &nbsp;</td>
+            <td valign="top">In some environments the WebSocket
+connection may fail due to intermediary firewalls, proxies, routers,
+etc. In that case take advantage of WebSocket's secure capability and
+check<strong> Use secure WebSocket (TLS)</strong>. Even if you have no issues you can still feel free to test using a secure connection.</td>
+          </tr>
+        </tbody></table>
+
+        <h2>Creating your own test</h2>
+        <p>Using a text editor, copy the following code and save it as <strong>websocket.html</strong>
+ somewhere on your hard drive. Then simply open it in a browser. The
+page will automatically connect, send a message, display the response,
+and close the connection.</p>
+
+
+      <div class="codePanel">
+        <pre>&lt;!DOCTYPE html&gt;
+
+&lt;meta charset="utf-8" /&gt;
+
+&lt;title&gt;WebSocket Test&lt;/title&gt;
+
+&lt;script language="javascript" type="text/javascript"&gt;
+
+  var wsUri = "ws://echo.websocket.org/";
+  var output;
+
+  function init()
+  {
+    output = document.getElementById("output");
+    testWebSocket();
+  }
+
+  function testWebSocket()
+  {
+    websocket = new WebSocket(wsUri);
+    websocket.onopen = function(evt) { onOpen(evt) };
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt) { onMessage(evt) };
+    websocket.onerror = function(evt) { onError(evt) };
+  }
+
+  function onOpen(evt)
+  {
+    writeToScreen("CONNECTED");
+    doSend("WebSocket rocks");
+  }
+
+  function onClose(evt)
+  {
+    writeToScreen("DISCONNECTED");
+  }
+
+  function onMessage(evt)
+  {
+    writeToScreen('&lt;span style="color: blue;"&gt;RESPONSE: ' + evt.data+'&lt;/span&gt;');
+    websocket.close();
+  }
+
+  function onError(evt)
+  {
+    writeToScreen('&lt;span style="color: red;"&gt;ERROR:&lt;/span&gt; ' + evt.data);
+  }
+
+  function doSend(message)
+  {
+    writeToScreen("SENT: " + message);
+    websocket.send(message);
+  }
+
+  function writeToScreen(message)
+  {
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+    output.appendChild(pre);
+  }
+
+  window.addEventListener("load", init, false);
+
+&lt;/script&gt;
+
+&lt;h2&gt;WebSocket Test&lt;/h2&gt;
+
+&lt;div id="output"&gt;&lt;/div&gt;
+
+&lt;/html&gt; </pre>
+</div>
+
+      </div> <!-- #main -->
+
+    </div> <!-- #main-container -->
+
+    <div class="clearfix"></div>
+
+    <footer>
+      <div style="float: right;">
+       © 2010 Kaazing Corporation. All Rights Reserved &nbsp; - &nbsp; <a href="mailto:webmaster@websocket.org">Contact Webmaster</a>
+      </div>
+      <div class="clearfix"></div>
+    </footer>
+
+  </div> <!-- #container -->
+
+
+  <!-- Javascript at the bottom for fast page loading -->
+
+  <!--[if lt IE 7 ]>
+    <script src="js/lib/dd_belatedpng.js"></script>
+    <script> DD_belatedPNG.fix('img, .png_bg'); //fix any <img> or .png_bg background-images </script>
+  <![endif]-->
+
+<script type="text/javascript" src="echo_fichiers/echo.js"></script>
+
+  <!-- Grab Google CDN's jQuery. fall back to local if necessary -->
+  <script src="echo_fichiers/jquery.htm"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="js/lib/jquery-1.4.2.js"%3E%3C/script%3E'))</script><script src="echo_fichiers/jquery-1.js"></script>
+
+
+
+
+</body></html>
