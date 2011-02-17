@@ -7,9 +7,6 @@ WebSockets) a policy server will also start on port 843.
 See: http://github.com/gimite/web-socket-js
 """
 
-__author__ = 'Reza Lotun'
-
-
 #from twisted.internet.protocol import Protocol, Factory
 #from twisted.web import resource
 from twisted.web.static import File
@@ -38,14 +35,10 @@ class EchoHandler(WebSocketHandler):
     def connectionMade(self):
         print 'Connected to client.'
         clients.append(self)
-        # here would be a good place to register this specific handler
-        # in a dictionary mapping some client identifier (like IPs) against
-        # self (this handler object)
 
     def connectionLost(self, reason):
         print 'Lost connection.'
         clients.remove(self)
-        # here is a good place to deregister this handler object
 
 class Simple(resource.Resource):
     def render_GET(self, request):
