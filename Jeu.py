@@ -8,6 +8,8 @@ gérer leurs points, et déclencher des calculs de trajectoire """
 
 
 class Jeu(WebSocketSite):
-    
     joueurs = []
     trajectoire = Trajectoire()
+
+    def __init__(self, resource):
+        WebSocketSite.__init__(self, resource)
