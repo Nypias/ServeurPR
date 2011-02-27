@@ -4,4 +4,5 @@
 utile pour mémoriser ses points/pseudo etc, son objet WebSocketHandler (histoire
 de pouvoir communiquer avec le joueur)... """
 class Joueur:
-	pass
+	def __init__(self):
+		pass
