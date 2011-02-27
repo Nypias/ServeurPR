@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-""" Méthode de calcul de trajectoire, doit implémenter une méthode pour
+""" Mï¿½thode de calcul de trajectoire, doit implï¿½menter une mï¿½thode pour
 transformer la trajectoire en string JSON """
 class Trajectoire:
 	def __init__(self):

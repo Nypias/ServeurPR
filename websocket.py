@@ -292,6 +292,7 @@ class WebSocketSite(Site):
         if not name.startswith("/"):
             raise ValueError("Invalid resource name.")
         self.handlers[name] = handlerFactory
+        self.handlers[name].site = self #rajoute par atamborrino qui emmerde l'encapsulation
 
 
 
