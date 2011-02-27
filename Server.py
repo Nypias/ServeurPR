@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
 #from twisted.internet.protocol import Protocol, Factory
-from twisted.web.static import File
-from twisted.web import server, resource
 from Jeu import Jeu
 from Joueur import Joueur
-from Trajectoire import Trajectoire
+from twisted.web import resource
 from websocket import *
 
 
