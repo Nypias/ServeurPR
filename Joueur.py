@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-""" Un objet de cette classe sera cr�� pour chaque joueur,
-utile pour m�moriser ses points/pseudo etc, son objet WebSocketHandler (histoire
+""" Un objet de cette classe sera créé pour chaque joueur,
+utile pour mémoriser ses points/pseudo etc, son objet WebSocketHandler (histoire
 de pouvoir communiquer avec le joueur)... """
 
 from websocket import *
@@ -10,6 +10,7 @@ class Joueur(WebSocketHandler):
     
 
     def __init__(self, transport):
+        print "ici"
         WebSocketHandler.__init__(self, transport)
         self.score=0
         self.name=""
