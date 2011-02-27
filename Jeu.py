@@ -1,7 +1,15 @@
 # -*- coding: utf-8 -*-
+from Joueur import Joueur
 
-""" Cette classe va gérer le jeu, càd conserver la liste des joueurs,
-gérer leurs points, et déclencher des calculs de trajectoire """
 
+""" Cette classe va gÃ©rer le jeu, cÃ d conserver la liste des joueurs,
+gÃ©rer leurs points, et dÃ©clencher des calculs de trajectoire """
 class Jeu:
-	pass
+    joueurs = []
+    
+    def __init__(self):
+        pass
+
+    def addJoueur(self, handler):
+        joueur = Joueur()
+        self.joueurs.append((joueur, handler))

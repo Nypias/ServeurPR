@@ -3,19 +3,21 @@
 #from twisted.internet.protocol import Protocol, Factory
 from twisted.web.static import File
 from twisted.web import server, resource
-import Jeu, Joueur, Trajectoire
+from Jeu import Jeu
+from Joueur import Joueur
+from Trajectoire import Trajectoire
 from websocket import *
 
-class EchoHandler(WebSocketHandler):
+class GameHandler(WebSocketHandler):
     clients = []
     
     def __init__(self, transport):
         WebSocketHandler.__init__(self, transport)
-        self.joueur = Joueur()
+        jeu.addJoueur(self)
 
     def __del__(self):
+        pass
         #print 'Deleting handler'
-        del self.joueur
 
     def frameReceived(self, frame):
         print "Received : \""+frame+"\""
@@ -42,7 +44,7 @@ if __name__ == "__main__":
     #WebSocketSite = une factory !
     #Simple() est une ressource
     factory = WebSocketSite(Simple())
-    factory.addHandler('/test', EchoHandler)
+    factory.addHandler('/game', GameHandler)
     reactor.listenTCP(8080, factory)
 
     jeu = Jeu()
