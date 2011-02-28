@@ -84,8 +84,11 @@
 
   function doSend()
   {
-    logToConsole("SENT: " + sendMessage.value);
-    websocket.send(sendMessage.value);
+	d = new Date()
+	msg = sendMessage.value
+	msg = msg.replace("HOUR", d.getTime());
+    logToConsole("SENT: " + msg);
+    websocket.send(msg);
   }
 
   function logToConsole(message)

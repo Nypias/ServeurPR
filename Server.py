@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-#from twisted.internet.protocol import Protocol, Factory
 from Jeu import Jeu
 from Joueur import Joueur
 from twisted.web.static import File

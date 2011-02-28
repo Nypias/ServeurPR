@@ -5,27 +5,37 @@ utile pour mémoriser ses points/pseudo etc, son objet WebSocketHandler (histoir
 de pouvoir communiquer avec le joueur)... """
 
 from websocket import *
+import json
+import time
 
 class Joueur(WebSocketHandler):
     
 
     def __init__(self, transport):
         WebSocketHandler.__init__(self, transport)
-        self.score=0
-        self.name=""
+        self.score = 0
+        self.name = ""
+        self.offset = 0
 
     def __del__(self):
         print 'Deleting handler'
 
+    def calcOffset(self, hour):
+        #OFFSET = LOCAL - REMOTE ! en millisecondes
+        #OFFSET négatif => client en retard sur le serveur, indique aussi la valeur du lag
+        return (time.time()*1000 - hour)
+
+    def decode(self, msg):
+        print msg
+        if (msg["msg"] == "Hello"):
+            self.name = msg["pseudo"]
+            self.offset = self.calcOffset(msg["time"])
+            print self.offset
+
     def frameReceived(self, frame):
-    	if self.name == "" :
-    		self.name = frame
-        # on affiche sur le serveur tous les noms des clients connectes
-        for joueur in self.site.joueurs:
-        	print joueur.name
+        self.decode(json.loads(frame))
         
-
-
+       
     def connectionMade(self):
         print 'Connected to client.'
         self.site.joueurs.append(self)
