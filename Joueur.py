@@ -10,7 +10,6 @@ class Joueur(WebSocketHandler):
     
 
     def __init__(self, transport):
-        print "ici"
         WebSocketHandler.__init__(self, transport)
         self.score=0
         self.name=""
