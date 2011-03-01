@@ -54,7 +54,6 @@ class Joueur(WebSocketHandler):
                 #TODO : à améliorer, appeler msgQuit() avec "Timeout" comme message de quit par ex
                 client.transport.write("Dégage")
                 client.transport.loseConnection()
-                self.msgGstat() #on indique que qqn est mort par timeout
                 
 
     def setAlive(self):
@@ -75,7 +74,7 @@ class Joueur(WebSocketHandler):
         msg["msg"] = "SyncJ"
         msg["raquettes"] = {}
         for player in self.site.joueurs:
-            msg["raquettes"][str(player.name)] = player.raquette
+            msg["raquettes"][player.name] = player.raquette
         self.sendAll(msg)
 
     def msgGstat(self):
