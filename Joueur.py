@@ -39,12 +39,12 @@ class Joueur(WebSocketHandler):
 
     def sendAll(self, msg):
         for client in self.site.joueurs:
-            client.transport.write(msg)
+            client.transport.write(json.dumps(msg))
 
     def calcOffset(self, hour):
         #OFFSET = LOCAL - REMOTE ! en millisecondes
         #OFFSET négatif => client en retard sur le serveur, indique aussi la valeur du lag
-        return -(time.time()*1000 - hour)
+        return - (time.time()*1000 - hour)
 
     def isAlive(self):
         for client in self.site.joueurs:
@@ -79,7 +79,16 @@ class Joueur(WebSocketHandler):
         self.sendAll(msg)
 
     def msgGstat(self):
-        pass
+        """ Envoi aux clients les informations sur tous les clients
+        
+        Les informations de chaque joueur sont son pseudo et son score"""
+        
+        msg = {}
+        msg["msg"] = "GStat"
+        msg["players"] = {}
+        for player in self.site.joueurs:
+            msg["players"][player.name] = player.score
+        self.sendAll(msg)
     
     def decode(self, msg):
         print "Message reçu : \n%s" % json.dumps(msg, indent = 2)
@@ -108,3 +117,4 @@ class Joueur(WebSocketHandler):
     def connectionLost(self, reason):
         print 'Lost connection.'
         self.site.joueurs.remove(self)
+        self.msgGstat()
