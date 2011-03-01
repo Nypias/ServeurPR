@@ -23,7 +23,7 @@ class Joueur(WebSocketHandler):
 
     def sendAll(self, msg):
         for client in self.site.joueurs:
-            client.transport.write(msg)
+            client.transport.write(json.dumps(msg))
 
     def calcOffset(self, hour):
         #OFFSET = LOCAL - REMOTE ! en millisecondes
@@ -58,7 +58,7 @@ class Joueur(WebSocketHandler):
         msg["players"] = {}
         for player in self.site.joueurs:
             msg["players"][player.name] = player.score
-        self.sendAll(json.dumps(msg))
+        self.sendAll(msg)
     
     def decode(self, msg):
         print "#######\nMessage reçu : %s\n#######" % msg
