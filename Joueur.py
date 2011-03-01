@@ -5,19 +5,35 @@ utile pour mémoriser ses points/pseudo etc, son objet WebSocketHandler (histoir
 de pouvoir communiquer avec le joueur)... """
 
 from websocket import *
+from twisted.internet import task
 import json
 import time
 
 class Joueur(WebSocketHandler):
-    
+    TIMEOUT = 10 #durée maximum de présence sans mouvement
 
     def __init__(self, transport):
         WebSocketHandler.__init__(self, transport)
+        #score du joueur
         self.score = 0
+        #pseudo du joueur
         self.name = ""
+        #décalage de temps, en ms, entre heure du serveur et heure du client
         self.offset = 0
+        #position (du centre) de la raquette sur son axe, entre 0 et 100
         self.raquette = 50
-
+        #heure, en ms, à laquelle on a entendu parler de ce client pour la dernière fois, utilisé pour détecter les timeouts
+        self.lastTimeSeen = 0
+        #on intialise cette valeur
+        self.setAlive()
+        #on va créer une boucle pour tester si le joueur est alive, avant on regarde si on n'a pas déjà créé cette boucle
+        #en fait on la crée une seule fois, quand le premier client se connecte
+        if (not hasattr(self.site, "pingLoop")):
+            #on définit un appel en boucle de isAlive avec comme paramètre self
+            self.site.pingLoop = task.LoopingCall(Joueur.isAlive, self)
+            #elle se déclenche toutes les secondes
+            self.site.pingLoop.start(1.0)
+        
     def __del__(self):
         print 'Deleting handler'
 
@@ -29,6 +45,20 @@ class Joueur(WebSocketHandler):
         #OFFSET = LOCAL - REMOTE ! en millisecondes
         #OFFSET négatif => client en retard sur le serveur, indique aussi la valeur du lag
         return -(time.time()*1000 - hour)
+
+    def isAlive(self):
+        for client in self.site.joueurs:
+            #si on n'a pas entendu parler du client depuis plus de TIMEOUT secondes
+            if ((time.time()*1000 - client.lastTimeSeen) > (self.TIMEOUT*1000)):
+                print "%s is offline (timeout) !" % client.name
+                #TODO : à améliorer, appeler msgQuit() avec "Timeout" comme message de quit par ex
+                client.transport.write("Dégage")
+                client.transport.loseConnection()
+                self.msgGstat() #on indique que qqn est mort par timeout
+                
+
+    def setAlive(self):
+        self.lastTimeSeen = time.time()*1000
 
     def msgHello(self, msg):
         #TODO il est interdit de faire un Hello une deuxième fois quand le joueur est déjà connecté : à détecter !
@@ -52,7 +82,7 @@ class Joueur(WebSocketHandler):
         pass
     
     def decode(self, msg):
-        print "#######\nMessage reçu : %s\n#######" % msg
+        print "Message reçu : \n%s" % json.dumps(msg, indent = 2)
         if (msg["msg"] == "Hello"):
             self.msgHello(msg)
             self.msgGstat()
@@ -62,7 +92,8 @@ class Joueur(WebSocketHandler):
         else:
             print "Message inconnu !"
 
-        print vars(self)
+        self.setAlive()
+        print "Attributs de self : %s" % vars(self)
             
 
     def frameReceived(self, frame):
