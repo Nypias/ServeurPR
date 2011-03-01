@@ -16,21 +16,54 @@ class Joueur(WebSocketHandler):
         self.score = 0
         self.name = ""
         self.offset = 0
+        self.raquette = 50
 
     def __del__(self):
         print 'Deleting handler'
 
+    def sendAll(self, msg):
+        for client in self.site.joueurs:
+            client.transport.write(msg)
+
     def calcOffset(self, hour):
         #OFFSET = LOCAL - REMOTE ! en millisecondes
         #OFFSET négatif => client en retard sur le serveur, indique aussi la valeur du lag
-        return (time.time()*1000 - hour)
+        return -(time.time()*1000 - hour)
 
+    def msgHello(self, msg):
+        #TODO il est interdit de faire un Hello une deuxième fois quand le joueur est déjà connecté : à détecter !
+        self.name = msg["pseudo"]
+        self.offset = self.calcOffset(msg["time"])
+
+    def msgBouge(self, msg):
+        #TODO déclencher erreur si n'est pas compris entre 0 et 100 : hack !
+        self.raquette = msg["raquette"]
+        self.offset = self.calcOffset(msg["time"])
+
+    def msgSyncJ(self):
+        msg = {}
+        msg["msg"] = "SyncJ"
+        msg["raquettes"] = {}
+        for player in self.site.joueurs:
+            msg["raquettes"][str(player.name)] = player.raquette
+        self.sendAll(msg)
+
+    def msgGstat(self):
+        pass
+    
     def decode(self, msg):
-        print msg
+        print "#######\nMessage reçu : %s\n#######" % msg
         if (msg["msg"] == "Hello"):
-            self.name = msg["pseudo"]
-            self.offset = self.calcOffset(msg["time"])
-            print self.offset
+            self.msgHello(msg)
+            self.msgGstat()
+        elif (msg["msg"] == "Bouge"):
+            self.msgBouge(msg)
+            self.msgSyncJ()
+        else:
+            print "Message inconnu !"
+
+        print vars(self)
+            
 
     def frameReceived(self, frame):
         self.decode(json.loads(frame))

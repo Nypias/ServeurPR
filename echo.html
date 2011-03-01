@@ -211,15 +211,39 @@ walks you creating a WebSocket yourself.</p>
             <br>
             <br>
             <strong>Message:</strong><br>
-            <textarea disabled="disabled" id="sendMessage" rows="10">
+            <textarea disabled="disabled" id="sendMessage1" rows="5">
 {
     "msg" : "Hello",
-    "pseudo" : "megalol",
+    "pseudo" : "playerA",
     "time" : HOUR
 }
 </textarea>
             <br>
-            <button disabled="disabled" id="send" class="wsButton">Send</button>
+            <button disabled="disabled" id="send1" class="wsButton">Send</button>
+			<br>
+            <br>
+            <strong>Message:</strong><br>
+            <textarea disabled="disabled" id="sendMessage2" rows="5">
+{
+    "msg" : "Hello",
+    "pseudo" : "playerB",
+    "time" : HOUR
+}
+</textarea>
+            <br>
+            <button disabled="disabled" id="send2" class="wsButton">Send</button>
+			<br>
+            <br>
+            <strong>Message:</strong><br>
+            <textarea disabled="disabled" id="sendMessage3" rows="5">
+{
+    "msg" : "Bouge",
+    "raquette" : 20,
+    "time" : HOUR
+}
+</textarea>
+            <br>
+            <button disabled="disabled" id="send3" class="wsButton">Send</button>
           </div>
           <div id="echo-log" style="float: left; margin-left: 20px; padding-left: 20px; width: 350px; border-left: solid 1px #cccccc;"> <strong>Log:</strong>
             <div id="consoleLog"></div>

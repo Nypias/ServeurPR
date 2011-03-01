@@ -34,10 +34,16 @@
     disconnectBut = document.getElementById("disconnect");
     disconnectBut.onclick = doDisconnect;
 
-    sendMessage = document.getElementById("sendMessage");
+    sendMessage1 = document.getElementById("sendMessage1");
+	sendMessage2 = document.getElementById("sendMessage2");
+	sendMessage3 = document.getElementById("sendMessage3");
 
-    sendBut = document.getElementById("send");
-    sendBut.onclick = doSend;
+    sendBut1 = document.getElementById("send1");
+    sendBut1.onclick = doSend1;
+	sendBut2 = document.getElementById("send2");
+    sendBut2.onclick = doSend2;
+	sendBut3 = document.getElementById("send3");
+    sendBut3.onclick = doSend3;
 
     consoleLog = document.getElementById("consoleLog");
 
@@ -47,8 +53,9 @@
     setGuiConnected(false);
 
     document.getElementById("disconnect").onclick = doDisconnect;
-    document.getElementById("send").onclick = doSend;
-
+    document.getElementById("send1").onclick = doSend1;
+	document.getElementById("send2").onclick = doSend2;
+	document.getElementById("send3").onclick = doSend3;
   }
 
   function toggleTls()
@@ -82,10 +89,28 @@
     websocket.close()
   }
 
-  function doSend()
+  function doSend1()
   {
 	d = new Date()
-	msg = sendMessage.value
+	msg = sendMessage1.value
+	msg = msg.replace("HOUR", d.getTime());
+    logToConsole("SENT: " + msg);
+    websocket.send(msg);
+  }
+  
+  function doSend2()
+  {
+	d = new Date()
+	msg = sendMessage2.value
+	msg = msg.replace("HOUR", d.getTime());
+    logToConsole("SENT: " + msg);
+    websocket.send(msg);
+  }
+  
+  function doSend3()
+  {
+	d = new Date()
+	msg = sendMessage3.value
 	msg = msg.replace("HOUR", d.getTime());
     logToConsole("SENT: " + msg);
     websocket.send(msg);
@@ -133,8 +158,12 @@
     wsUri.disabled = isConnected;
     connectBut.disabled = isConnected;
     disconnectBut.disabled = !isConnected;
-    sendMessage.disabled = !isConnected;
-    sendBut.disabled = !isConnected;
+    sendMessage1.disabled = !isConnected;
+    sendBut1.disabled = !isConnected;
+	sendMessage2.disabled = !isConnected;
+    sendBut2.disabled = !isConnected;
+	sendMessage3.disabled = !isConnected;
+    sendBut3.disabled = !isConnected;
     secureCb.disabled = isConnected;
     var labelColor = "black";
     if (isConnected)

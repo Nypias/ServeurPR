@@ -4,6 +4,7 @@ from Jeu import Jeu
 from Joueur import Joueur
 from twisted.web.static import File
 from websocket import *
+import webbrowser #TESTING purpose
 
 
 if __name__ == "__main__":
@@ -18,6 +19,8 @@ if __name__ == "__main__":
 
 
     print "launching reactor"
+    webbrowser.open("http://localhost:8080/echo.html")
+    webbrowser.open("http://localhost:8080/echo.html")
     reactor.run()
     print "stop reactor"
 
