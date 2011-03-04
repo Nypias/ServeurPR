@@ -63,6 +63,7 @@ class Joueur(WebSocketHandler):
         #TODO il est interdit de faire un Hello une deuxième fois quand le joueur est déjà connecté : à détecter !
         self.name = msg["pseudo"]
         self.offset = self.calcOffset(msg["time"])
+        self.msgGstat()
 
     def msgBouge(self, msg):
         #TODO déclencher erreur si n'est pas compris entre 0 et 100 : hack !
