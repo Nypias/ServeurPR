@@ -13,6 +13,7 @@ class Trajectoire :
     
     TAILLE_RAQ = 100
     TIME_INT = 0.05
+    
 
     def __init__(self, joueurs):
 

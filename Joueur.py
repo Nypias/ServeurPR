@@ -24,7 +24,7 @@ class Joueur(WebSocketHandler):
         #position (du centre) de la raquette sur son axe, entre 0 et 100
         self.raquette = 50
         #position de l'axe sur lequel est la raquette du joueur (axe avec numero arbitraire pour le moment)
-        self.axe= len(self.site.joueurs) # sera affecte au moment du Hello
+        self.axe= len(self.site.joueurs)
         #heure, en ms, à laquelle on a entendu parler de ce client pour la dernière fois, utilisé pour détecter les timeouts
         self.lastTimeSeen = 0
         #on intialise cette valeur
