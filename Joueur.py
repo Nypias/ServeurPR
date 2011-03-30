@@ -10,8 +10,9 @@ import json
 import time
 
 class Joueur(WebSocketHandler):
-    TIMEOUT = 10 #durée maximum de présence sans mouvement
-
+    TIMEOUT = 1000000 #durée maximum de présence sans mouvement
+    
+    
     def __init__(self, transport):
         WebSocketHandler.__init__(self, transport)
         #score du joueur
@@ -22,6 +23,8 @@ class Joueur(WebSocketHandler):
         self.offset = 0
         #position (du centre) de la raquette sur son axe, entre 0 et 100
         self.raquette = 50
+        #position de l'axe sur lequel est la raquette du joueur (axe avec numero arbitraire pour le moment)
+        self.axe= len(self.site.joueurs) # sera affecte au moment du Hello
         #heure, en ms, à laquelle on a entendu parler de ce client pour la dernière fois, utilisé pour détecter les timeouts
         self.lastTimeSeen = 0
         #on intialise cette valeur
@@ -42,9 +45,12 @@ class Joueur(WebSocketHandler):
             client.transport.write(json.dumps(msg))
 
     def calcOffset(self, hour):
-        #OFFSET = LOCAL - REMOTE ! en millisecondes
+        #OFFSET = REMOTE - LOCAL  ! en millisecondes
         #OFFSET négatif => client en retard sur le serveur, indique aussi la valeur du lag
         return - (time.time()*1000 - hour)
+    
+    def getHourClient(self):
+        return (self.offset +  time.time()*1000)
 
     def isAlive(self):
         for client in self.site.joueurs:
@@ -79,7 +85,7 @@ class Joueur(WebSocketHandler):
         self.sendAll(msg)
 
     def msgGstat(self):
-        """ Envoi aux clients les informations sur tous les clients
+        """ Envoi aux clients les informations sur tous les clients.
         
         Les informations de chaque joueur sont son pseudo et son score"""
         
@@ -91,7 +97,7 @@ class Joueur(WebSocketHandler):
         self.sendAll(msg)
     
     def decode(self, msg):
-        print "Message reçu : \n%s" % json.dumps(msg, indent = 2)
+        #print "Message reçu : \n%s" % json.dumps(msg, indent = 2)
         if (msg["msg"] == "Hello"):
             self.msgHello(msg)
             self.msgGstat()
@@ -102,7 +108,7 @@ class Joueur(WebSocketHandler):
             print "Message inconnu !"
 
         self.setAlive()
-        print "Attributs de self : %s" % vars(self)
+        #print "Attributs de self : %s" % vars(self)
             
 
     def frameReceived(self, frame):
