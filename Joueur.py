@@ -41,8 +41,9 @@ class Joueur(WebSocketHandler):
         print 'Deleting handler'
 
     def sendAll(self, msg):
-        for client in self.site.joueurs:
-            client.transport.write(json.dumps(msg))
+        for client in self.site.joueurs.values():
+            if client != None:
+                client.transport.write(json.dumps(msg))
 
     def calcOffset(self, hour):
         #OFFSET = REMOTE - LOCAL  ! en millisecondes
@@ -53,13 +54,14 @@ class Joueur(WebSocketHandler):
         return (self.offset +  time.time()*1000)
 
     def isAlive(self):
-        for client in self.site.joueurs:
-            #si on n'a pas entendu parler du client depuis plus de TIMEOUT secondes
-            if ((time.time()*1000 - client.lastTimeSeen) > (self.TIMEOUT*1000)):
-                print "%s is offline (timeout) !" % client.name
-                #TODO : à améliorer, appeler msgQuit() avec "Timeout" comme message de quit par ex
-                client.transport.write("Dégage")
-                client.transport.loseConnection()
+        for client in self.site.joueurs.values():
+            if client != None:
+                #si on n'a pas entendu parler du client depuis plus de TIMEOUT secondes
+                if ((time.time()*1000 - client.lastTimeSeen) > (self.TIMEOUT*1000)):
+                    print "%s is offline (timeout) !" % client.name
+                    #TODO : à améliorer, appeler msgQuit() avec "Timeout" comme message de quit par ex
+                    client.transport.write("Dégage")
+                    client.transport.loseConnection()
                 
 
     def setAlive(self):
@@ -81,7 +83,8 @@ class Joueur(WebSocketHandler):
         msg["msg"] = "SyncJ"
         msg["raquettes"] = {}
         for player in self.site.joueurs:
-            msg["raquettes"][player.name] = player.raquette
+            if player != None:
+                msg["raquettes"][player.name] = player.raquette
         self.sendAll(msg)
 
     def msgGstat(self):
@@ -92,8 +95,9 @@ class Joueur(WebSocketHandler):
         msg = {}
         msg["msg"] = "GStat"
         msg["players"] = {}
-        for player in self.site.joueurs:
-            msg["players"][player.name] = player.score
+        for player in self.site.joueurs.values():
+            if player != None:
+                msg["players"][player.name] = player.score
         self.sendAll(msg)
     
     def decode(self, msg):
@@ -117,10 +121,10 @@ class Joueur(WebSocketHandler):
        
     def connectionMade(self):
         print 'Connected to client.'
-        self.site.joueurs.append(self)
+        self.site.ajouterJoueur(self)
         
 
     def connectionLost(self, reason):
         print 'Lost connection.'
-        self.site.joueurs.remove(self)
+        self.site.enleverJoueur(self)
         self.msgGstat()

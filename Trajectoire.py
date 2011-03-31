@@ -41,28 +41,24 @@ class Trajectoire :
         
     def sendPoint(self, point,temps):
         
-        for client in self.joueurs:
-            message = { "msg" : "Trajectoire", "point" : (point,client.getHourClient() + temps)}
-            client.transport.write(json.dumps(message))
+        for client in self.joueurs.values():
+            if client != None:
+                message = { "msg" : "Trajectoire", "point" : (point,client.getHourClient() + temps)}
+                client.transport.write(json.dumps(message))
 
     def choisirTrajectoire(self, pointDepart, angle):
         # TODO : faire une fonction "trouver joueur en fonction de l'axe d'arret  de la balle"
         axeJoueur = False
         rebondSurRaquette = False
-        if self.ball[0] <= 0: 
-            try:
+        
+        if self.ball[0] <= 0: # axe 0
+            if self.joueurs[0] != None:
                 joueur = self.joueurs[0]
-            except:
-                pass
-            else:
                 axeJoueur = True
                 
-        elif self.ball[0] >= 100:
-            try:
+        elif self.ball[0] >= 100: # axe 1
+            if self.joueurs[1] != None:
                 joueur = self.joueurs[1]
-            except:
-                pass
-            else:
                 axeJoueur = True
                 
         if axeJoueur == True:
