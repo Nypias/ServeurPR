@@ -24,7 +24,7 @@ class Joueur(WebSocketHandler):
         #position (du centre) de la raquette sur son axe, entre 0 et 100
         self.raquette = 50
         #position de l'axe sur lequel est la raquette du joueur (axe avec numero arbitraire pour le moment)
-        self.axe= len(self.site.joueurs)
+        #self.axe= len(self.site.joueurs)
         #heure, en ms, à laquelle on a entendu parler de ce client pour la dernière fois, utilisé pour détecter les timeouts
         self.lastTimeSeen = 0
         #on intialise cette valeur
@@ -41,8 +41,7 @@ class Joueur(WebSocketHandler):
         print 'Deleting handler'
 
     def sendAll(self, msg):
-        for client in self.site.joueurs.values():
-            if client != None:
+        for client in self.site.getJoueurs():
                 client.transport.write(json.dumps(msg))
 
     def calcOffset(self, hour):
@@ -54,8 +53,7 @@ class Joueur(WebSocketHandler):
         return (self.offset +  time.time()*1000)
 
     def isAlive(self):
-        for client in self.site.joueurs.values():
-            if client != None:
+        for client in self.site.getJoueurs():
                 #si on n'a pas entendu parler du client depuis plus de TIMEOUT secondes
                 if ((time.time()*1000 - client.lastTimeSeen) > (self.TIMEOUT*1000)):
                     print "%s is offline (timeout) !" % client.name
@@ -82,9 +80,8 @@ class Joueur(WebSocketHandler):
         msg = {}
         msg["msg"] = "SyncJ"
         msg["raquettes"] = {}
-        for player in self.site.joueurs:
-            if player != None:
-                msg["raquettes"][player.name] = player.raquette
+        for client in self.site.getJoueurs():
+            msg["raquettes"][client.name] = client.raquette
         self.sendAll(msg)
 
     def msgGstat(self):
@@ -95,9 +92,8 @@ class Joueur(WebSocketHandler):
         msg = {}
         msg["msg"] = "GStat"
         msg["players"] = {}
-        for player in self.site.joueurs.values():
-            if player != None:
-                msg["players"][player.name] = player.score
+        for client in self.site.getJoueurs():
+            msg["players"][client.name] = client.score
         self.sendAll(msg)
     
     def decode(self, msg):

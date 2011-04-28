@@ -8,24 +8,33 @@ gérer leurs points, et déclencher des calculs de trajectoire """
 
 
 class Jeu(WebSocketSite):
-    joueurs = { 0 : None , 1 : None} # Mode deux joueurs pour l'instant, les numeros représentants l'axe de la raquette
-                                    # 1 = axe de gauche , 2 = axe de droite
-    trajectoire = Trajectoire(joueurs)
+     
+    
 
     def __init__(self, resource):
         WebSocketSite.__init__(self, resource)
+        self.joueurs = { 0 : None , 1 : None} # Mode deux joueurs pour l'instant, les numeros représentants l'axe de la raquette
+                                    # 1 = axe de gauche , 2 = axe de droite
+        trajectoire = Trajectoire(self)
         
     def ajouterJoueur(self,joueur):
-        for numAxe in Jeu.joueurs.keys():
-            if Jeu.joueurs[numAxe] == None:
-                Jeu.joueurs[numAxe] = joueur
+        for numAxe in self.joueurs.keys():
+            if self.joueurs[numAxe] == None:
+                self.joueurs[numAxe] = joueur
                 break
         else:
             print "Nombre max de joueurs atteints"
-            # TODO : Dire au client que plus de place... (cas du pong à 2 joueurs pour l'instant)
+            # TODO : Créer un nouveau Jeu! ou bien DECO le joueur
             
     def enleverJoueur(self,joueur):
-        numeroAxeJoueur = Jeu.joueurs.values().index(joueur)
+        numeroAxeJoueur = self.joueurs.values().index(joueur)
         print numeroAxeJoueur
-        Jeu.joueurs[numeroAxeJoueur] = None
+        self.joueurs[numeroAxeJoueur] = None
+        
+    def getJoueurs(self):
+        joueurs = []
+        for joueur in self.joueurs.values():
+            if joueur != None:
+                joueurs.append(joueur)
+        return joueurs
             
