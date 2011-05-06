@@ -94,7 +94,9 @@ class Joueur(WebSocketHandler):
         msg["msg"] = "GStat"
         msg["players"] = {}
         for client in self.site.getJoueurs():
-            msg["players"][client.name] = client.score
+            msg["players"][client.name] = {}
+            msg["players"][client.name]["points"] = client.score
+            msg["players"][client.name]["axe"] = client.axe
         self.sendAll(msg)
     
     def decode(self, msg):
