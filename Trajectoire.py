@@ -10,8 +10,8 @@ transformer la trajectoire en string JSON """
 
 class Trajectoire :
     
-    TAILLE_RAQ = 20
-    TIME_INT = 0.03
+    TAILLE_RAQ = 20 #taille de la raquette entre 0 et 100 (en pourcentage)
+    TIME_INT = 0.03 #vitesse (sans unité particulière) de la balle
     
 
     def __init__(self, jeu):
