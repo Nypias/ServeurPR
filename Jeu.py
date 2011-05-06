@@ -13,15 +13,14 @@ class Jeu(WebSocketSite):
 
     def __init__(self, resource):
         WebSocketSite.__init__(self, resource)
-        self.joueurs = { 0 : None , 1 : None} # Mode deux joueurs pour l'instant, les numeros représentants l'axe de la raquette
-                                    # 1 = axe de gauche , 2 = axe de droite
+        self.nbJoueurs = 0
+        self.joueurs = {0 : None , 1 : None, 2 : None , 3 : None , 4 : None , 5 : None, 6 : None , 7 : None , 8 : None} 
         trajectoire = Trajectoire(self)
         
     def ajouterJoueur(self,joueur):
-        for numAxe in self.joueurs.keys():
-            if self.joueurs[numAxe] == None:
-                self.joueurs[numAxe] = joueur
-                break # ha beurk, à améliorer ? 
+        if self.nbJoueurs < 8:
+                self.nbJoueurs = self.nbJoueurs + 1
+                self.joueurs[self.nbJoueurs] = joueur			    
         else:
             print "Nombre max de joueurs atteints"
             # TODO : Créer un nouveau Jeu! ou bien DECO le joueur
@@ -37,4 +36,5 @@ class Jeu(WebSocketSite):
             if joueur != None:
                 joueurs.append(joueur)
         return joueurs
+	
             
