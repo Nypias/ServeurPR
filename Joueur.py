@@ -103,7 +103,6 @@ class Joueur(WebSocketHandler):
         #print "Message reçu : \n%s" % json.dumps(msg, indent = 2)
         if (msg["msg"] == "Hello"):
             self.msgHello(msg)
-            self.msgGstat()
         elif (msg["msg"] == "Bouge"):
             self.msgBouge(msg)
             self.msgSyncJ()
