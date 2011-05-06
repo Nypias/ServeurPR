@@ -71,7 +71,7 @@ class Joueur(WebSocketHandler):
 
 
     def perdre(self):
-        self.score -= 1 # TODO : faire une méthode "joueur.perdre()" qui envoie un message Collision avec STATUS = MISS" + Gstat
+        self.score -= 1
         self.msgCollision(False)
         self.msgGstat()
 
