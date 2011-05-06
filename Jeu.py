@@ -21,7 +21,7 @@ class Jeu(WebSocketSite):
         for numAxe in self.joueurs.keys():
             if self.joueurs[numAxe] == None:
                 self.joueurs[numAxe] = joueur
-                break
+                break # ha beurk, à améliorer ? 
         else:
             print "Nombre max de joueurs atteints"
             # TODO : Créer un nouveau Jeu! ou bien DECO le joueur
