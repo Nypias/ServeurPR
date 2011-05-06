@@ -43,7 +43,10 @@ class Joueur(WebSocketHandler):
 
     def sendAll(self, msg):
 		for client in self.site.getJoueurs():
-			client.transport.write(json.dumps(msg))
+			client.send(msg)
+
+    def send(self, msgJSON):
+        self.transport.write(json.dumps(msgJSON))
 
     def calcOffset(self, hour):
         #OFFSET = REMOTE - LOCAL  ! en millisecondes
@@ -65,6 +68,21 @@ class Joueur(WebSocketHandler):
 
     def setAlive(self):
         self.lastTimeSeen = time.time()*1000
+
+
+    def perdre(self):
+        self.score -= 1 # TODO : faire une méthode "joueur.perdre()" qui envoie un message Collision avec STATUS = MISS" + Gstat
+        self.msgCollision(False)
+        self.msgGstat()
+
+    def msgCollision(self, hit):
+        msg = {}
+        msg["msg"] = "Collision"
+        if hit:
+            msg["status"] = "HIT"
+        else:
+            msg["status"] = "MISS"
+        self.send(msg)
 
     def msgHello(self, msg):
         #TODO il est interdit de faire un Hello une deuxième fois quand le joueur est déjà connecté : à détecter !
