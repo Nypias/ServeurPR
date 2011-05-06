@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import time
 import random, math
 
 import json
@@ -26,9 +25,9 @@ class Trajectoire :
         self.ball[1] = self.ball[1] - math.sin(math.radians(angle)) # "-" car l'axe des Y est vers le bas
         while(self.ball[0] > 0 and self.ball[0] < 100 and self.ball[1] > 0 and self.ball[1] < 100):
             self.ball[0] = self.ball[0] + math.cos(math.radians(angle))
-            self.ball[1] = self.ball[1] - math.sin(math.radians(angle))
+            self.ball[1] = self.ball[1] - math.sin(math.radians(angle)) # "-" car l'axe des Y est vers le bas
             #print self.ball[0], self.ball[1]
-            time += Trajectoire.TIME_INT # "-" car l'axe des Y est vers le bas
+            time += Trajectoire.TIME_INT
         self.ball[0] = self.ball[0]
         self.ball[1] = self.ball[1]
 
@@ -61,13 +60,13 @@ class Trajectoire :
                 joueur = self.joueurs[1]
                 axeJoueur = True
                 
-        if axeJoueur == True:
+        if axeJoueur:
             if (joueur.raquette + Trajectoire.TAILLE_RAQ / 2) > self.ball[1] and (joueur.raquette - Trajectoire.TAILLE_RAQ / 2) < self.ball[1]:
                 rebondSurRaquette = True
                 print "rebondSurRaquette SUR RAQUETTE"
                 # TODO : envoyer un message Collision avec STATUS = "HIT" + Gstat
         
-        if axeJoueur == False or rebondSurRaquette == True :
+        if (not axeJoueur) or (rebondSurRaquette) :
             
             if self.ball[0] <= 0 or self.ball[0] >= 100: #si x = 0 ou 100 => collision sur un bord vertical (// axe y) => a' = 180 - a
                 angle = 180 - angle
