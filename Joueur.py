@@ -23,8 +23,9 @@ class Joueur(WebSocketHandler):
         self.offset = 0
         #position (du centre) de la raquette sur son axe, entre 0 et 100
         self.raquette = 50
-        #position de l'axe sur lequel est la raquette du joueur (axe avec numero arbitraire pour le moment)
-        #self.axe= len(self.site.joueurs)
+        #numéro de l'axe sur lequel est la raquette du joueur (0 : raquette gauche, 1 : raquette droite)
+        #quand on est ici, ce nouveau joueur n'a pas encore été ajouté dans self.site.joueurs => +1
+        self.axe = len(self.site.joueurs) - self.site.joueurs.values().count(None)
         #heure, en ms, à laquelle on a entendu parler de ce client pour la dernière fois, utilisé pour détecter les timeouts
         self.lastTimeSeen = 0
         #on intialise cette valeur
@@ -41,8 +42,8 @@ class Joueur(WebSocketHandler):
         print 'Deleting handler'
 
     def sendAll(self, msg):
-        for client in self.site.getJoueurs():
-                client.transport.write(json.dumps(msg))
+		for client in self.site.getJoueurs():
+			client.transport.write(json.dumps(msg))
 
     def calcOffset(self, hour):
         #OFFSET = REMOTE - LOCAL  ! en millisecondes
@@ -54,12 +55,12 @@ class Joueur(WebSocketHandler):
 
     def isAlive(self):
         for client in self.site.getJoueurs():
-                #si on n'a pas entendu parler du client depuis plus de TIMEOUT secondes
-                if ((time.time()*1000 - client.lastTimeSeen) > (self.TIMEOUT*1000)):
-                    print "%s is offline (timeout) !" % client.name
-                    #TODO : à améliorer, appeler msgQuit() avec "Timeout" comme message de quit par ex
-                    client.transport.write("Dégage")
-                    client.transport.loseConnection()
+			#si on n'a pas entendu parler du client depuis plus de TIMEOUT secondes
+			if ((time.time()*1000 - client.lastTimeSeen) > (self.TIMEOUT*1000)):
+				print "%s is offline (timeout) !" % client.name
+				#TODO : à améliorer, appeler msgQuit() avec "Timeout" comme message de quit par ex
+				client.transport.write("Dégage")
+				client.transport.loseConnection()
                 
 
     def setAlive(self):
