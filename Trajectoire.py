@@ -22,13 +22,11 @@ class Trajectoire :
         temps = 0
         angle = random.random()*360
         self.ball = [50, 50]
-        self.ball[0] = self.ball[0] + math.cos(math.radians(angle))
-        self.ball[1] = self.ball[1] - math.sin(math.radians(angle))
         u = (- self.ball[0]) / math.cos(math.radians(angle))
-        if u<0:
+        if u<=0:
             u = (100 - self.ball[0]) / math.cos(math.radians(angle))            
         v = self.ball[1] / math.sin(math.radians(angle)) 
-        if v<0:
+        if v<=0:
             v = (self.ball[1] - 100) / math.sin(math.radians(angle))
         u = min(u,v)
         # result
@@ -88,8 +86,6 @@ class Trajectoire :
             angle = random.random()*360
         self.ball = list(pointDepart)
         
-        self.ball[0] = self.ball[0] + math.cos(math.radians(angle))
-        self.ball[1] = self.ball[1] - math.sin(math.radians(angle)) 
         #while(self.ball[0] > 0 and self.ball[0] < 100 and self.ball[1] > 0 and self.ball[1] < 100):
         #    self.ball[0] = self.ball[0] + math.cos(math.radians(angle))
         #    self.ball[1] = self.ball[1] - math.sin(math.radians(angle))
@@ -101,10 +97,10 @@ class Trajectoire :
         # faster algo
         # determination of the shortest length to face a wall 
         u = (- self.ball[0]) / math.cos(math.radians(angle))
-        if u<0:
+        if u<=0:
             u = (100 - self.ball[0]) / math.cos(math.radians(angle))            
         v = self.ball[1] / math.sin(math.radians(angle)) 
-        if v<0:
+        if v<=0:
             v = (self.ball[1] - 100) / math.sin(math.radians(angle))
         u = min(u,v)
         # result
