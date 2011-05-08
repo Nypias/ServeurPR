@@ -46,7 +46,7 @@ class Trajectoire :
     def sendPoint(self, point,temps):
         
         for client in self.jeu.getJoueurs():
-                message = { "msg" : "Trajectoire", "point" : (point,client.getHourClient() + temps*1000)}
+                message = { "msg" : "Trajectoire", "point" : (point, int(client.getHourClient() + temps*1000))}
                 client.transport.write(json.dumps(message))
 
     def choisirTrajectoire(self, pointDepart, angle):
