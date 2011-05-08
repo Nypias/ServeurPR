@@ -45,6 +45,7 @@ class Trajectoire :
         
         for client in self.jeu.getJoueurs():
                 message = { "msg" : "Trajectoire", "point" : (point, int(client.getHourClient() + temps*1000))}
+                json.encoder.FLOAT_REPR = lambda f: ("%.2f" % f)
                 client.transport.write(json.dumps(message))
 
     def choisirTrajectoire(self, pointDepart, angle):
@@ -108,12 +109,13 @@ class Trajectoire :
         # result
         self.ball[0] = round(self.ball[0] + u*math.cos(math.radians(angle)),2)
         self.ball[1] = round(self.ball[1] - u*math.sin(math.radians(angle)),2)
+
         temps = u * Trajectoire.TIME_INT
         
         pointCollision = (self.ball[0], self.ball[1])
         self.sendPoint(pointCollision,temps)
         
-        print "COLLISION dans " + str(temps) + " avec positionCollision = " + str(pointCollision)
+        print "COLLISION dans " + str(temps) + " avec positionCollision = (%.2f, %.2f)" % (pointCollision[0], pointCollision[1])
         #print self.joueurs.items()
         reactor.callLater(temps, self.choisirTrajectoire, pointCollision, angle)
         
