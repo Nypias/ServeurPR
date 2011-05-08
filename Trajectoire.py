@@ -11,7 +11,7 @@ transformer la trajectoire en string JSON """
 class Trajectoire :
     
     TAILLE_RAQ = 20 #taille de la raquette entre 0 et 100 (en pourcentage)
-    TIME_INT = 0.03 #vitesse (sans unité particulière) de la balle
+    TIME_INT = 0.0003 #vitesse (sans unité particulière) de la balle
     
 
     def __init__(self, jeu):
@@ -20,7 +20,16 @@ class Trajectoire :
         self.joueurs = self.jeu.joueurs
         
         temps = 0
-        angle = random.random()*360
+        #on tire de préférence à l'horizontale...
+        petitangle = random.random()*45       
+        dg = 180
+        if random.random() > 0,5:
+            dg = 0
+        hb = -1
+        if random.random() > 0,5:
+            hb = 1
+        angle = dg + hb*petitangle
+        
         self.ball = [50, 50]
         u = (- self.ball[0]) / math.cos(math.radians(angle))
         if u<=0:
