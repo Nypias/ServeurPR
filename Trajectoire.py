@@ -18,37 +18,31 @@ class Trajectoire :
 
         self.jeu = jeu;
         self.joueurs = self.jeu.joueurs
-        if jeu.nbJoueurs <= 2:
-			time = 0
-			angle = random.random()*360
-			self.ball = [50, 50]
-			self.ball[0] = self.ball[0] + math.cos(math.radians(angle))
-			self.ball[1] = self.ball[1] - math.sin(math.radians(angle)) # "-" car l'axe des Y est vers le bas
-			while(self.ball[0] > 0 and self.ball[0] < 100 and self.ball[1] > 0 and self.ball[1] < 100):
-				self.ball[0] = self.ball[0] + math.cos(math.radians(angle))
-				self.ball[1] = self.ball[1] - math.sin(math.radians(angle)) # "-" car l'axe des Y est vers le bas
-				#print self.ball[0], self.ball[1]
-				time += Trajectoire.TIME_INT
-			self.ball[0] = self.ball[0]
-			self.ball[1] = self.ball[1]
-
-			pointCollision = (self.ball[0], self.ball[1])
-			
-			print "COLLISION dans " + str(time) + " avec positionCollision = " + str(pointCollision)
-			
-			self.sendPoint(pointCollision,time)
-			reactor.callLater(time, self.choisirTrajectoire, pointCollision, angle)
-        elif jeu.nbJoueurs > 2:
-            # creation of the field
-            angle = 360/jeu.nbJoueurs
-            self.Xfield[50,90] # list of the ordinate starting with the field center and next the field corners
-            self.Yfield[50,50] # list of the abscissa ...
-            i = 1
-            while i<jeu.nbJoueurs:
-                self.Xfield.append(50 + 40*math.cos(angle*i)) # trunc isn't needed, python is so high
-                self.Yfield.append(50 + 40*math.sin(angle*i))
-                self.Xball[90,0] 
         
+        time = 0
+        angle = random.random()*360
+        self.ball = [50, 50]
+        self.ball[0] = self.ball[0] + math.cos(math.radians(angle))
+        self.ball[1] = self.ball[1] - math.sin(math.radians(angle))
+        u = (- self.ball[0]) / math.cos(math.radians(angle))
+        if u<0:
+            u = (100 - self.ball[0]) / math.cos(math.radians(angle))            
+        v = self.ball[1] / math.sin(math.radians(angle)) 
+        if v<0:
+            v = (self.ball[1] - 100) / math.sin(math.radians(angle))
+        u = min(u,v)
+        # result
+        self.ball[0] = self.ball[0] + u*math.cos(math.radians(angle))
+        self.ball[1] = self.ball[1] - u*math.sin(math.radians(angle))
+        time = u * Trajectoire.TIME_INT
+        
+        pointCollision = (self.ball[0], self.ball[1])
+		
+        print "COLLISION dans " + str(time) + " avec positionCollision = " + str(pointCollision)
+		
+        self.sendPoint(pointCollision,time)
+        reactor.callLater(time, self.choisirTrajectoire, pointCollision, angle)
+     
     def sendPoint(self, point,temps):
         
         for client in self.jeu.getJoueurs():
