@@ -18,9 +18,12 @@ class Jeu(WebSocketSite):
         trajectoire = Trajectoire(self)
         
     def ajouterJoueur(self,joueur):
-        if self.nbJoueurs < 8:
-                self.nbJoueurs = self.nbJoueurs + 1
-                self.joueurs[self.nbJoueurs] = joueur			    
+        if self.nbJoueurs < 9:
+			for numAxe in self.joueurs.keys():
+				if self.joueurs[numAxe] == None:
+					self.joueurs[numAxe] = joueur
+					self.nbJoueurs = self.nbJoueurs + 1
+					break
         else:
             print "Nombre max de joueurs atteints"
             # TODO : Créer un nouveau Jeu! ou bien DECO le joueur

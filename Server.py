@@ -21,6 +21,7 @@ if __name__ == "__main__":
     print "launching reactor"
     webbrowser.open("http://localhost:8080/echo.html")
     webbrowser.open("http://localhost:8080/echo.html")
+    webbrowser.open("http://localhost:8080/echo.html")
     reactor.run()
     print "stop reactor"
 
