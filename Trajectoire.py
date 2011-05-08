@@ -16,7 +16,7 @@ class Trajectoire :
 
     def __init__(self, jeu):
 
-        self.jeu = jeu;
+        self.jeu = jeu
         self.joueurs = self.jeu.joueurs
         
         temps = 0
@@ -33,14 +33,14 @@ class Trajectoire :
         self.ball = [50, 50]
         u = (- self.ball[0]) / math.cos(math.radians(angle))
         if u<=0:
-            u = (100 - self.ball[0]) / math.cos(math.radians(angle))            
-        v = self.ball[1] / math.sin(math.radians(angle)) 
+            u = (100 - self.ball[0]) / math.cos(math.radians(angle))      
+        v = self.ball[1] / math.sin(math.radians(angle))
         if v<=0:
             v = (self.ball[1] - 100) / math.sin(math.radians(angle))
         u = min(u,v)
         # result
-        self.ball[0] = self.ball[0] + u*math.cos(math.radians(angle))
-        self.ball[1] = self.ball[1] - u*math.sin(math.radians(angle))
+        self.ball[0] = round(self.ball[0] + u*math.cos(math.radians(angle)),2)
+        self.ball[1] = round(self.ball[1] - u*math.sin(math.radians(angle)),2)
         temps = u * Trajectoire.TIME_INT
         
         pointCollision = (self.ball[0], self.ball[1])
@@ -54,6 +54,7 @@ class Trajectoire :
         
         for client in self.jeu.getJoueurs():
                 message = { "msg" : "Trajectoire", "point" : (point, int(client.getHourClient() + temps*1000))}
+                json.encoder.FLOAT_REPR = lambda f: ("%.2f" % f)
                 client.transport.write(json.dumps(message))
 
     def choisirTrajectoire(self, pointDepart, angle):
@@ -79,7 +80,9 @@ class Trajectoire :
         
         if (not axeJoueur) or (rebondSurRaquette) :
             
-            if self.ball[0] <= 0 or self.ball[0] >= 100: #si x = 0 ou 100 => collision sur un bord vertical (// axe y) => a' = 180 - a
+            if (self.ball[0] == 0 or self.ball[0] == 100 ) and (self.ball[1] == 0 or self.ball[1]==100 ):
+                angle = 180 + angle
+            elif self.ball[0] <= 0 or self.ball[0] >= 100: #si x = 0 ou 100 => collision sur un bord vertical (// axe y) => a' = 180 - a
                 angle = 180 - angle
             elif (self.ball[1] <= 0 or self.ball[1] >= 100): #si y = 0 ou 100 => collision sur un bord horizontal (// axe x) => a' = - a
                 angle = 360 - angle
@@ -113,14 +116,15 @@ class Trajectoire :
             v = (self.ball[1] - 100) / math.sin(math.radians(angle))
         u = min(u,v)
         # result
-        self.ball[0] = self.ball[0] + u*math.cos(math.radians(angle))
-        self.ball[1] = self.ball[1] - u*math.sin(math.radians(angle))
+        self.ball[0] = round(self.ball[0] + u*math.cos(math.radians(angle)),2)
+        self.ball[1] = round(self.ball[1] - u*math.sin(math.radians(angle)),2)
+
         temps = u * Trajectoire.TIME_INT
         
         pointCollision = (self.ball[0], self.ball[1])
         self.sendPoint(pointCollision,temps)
         
-        print "COLLISION dans " + str(temps) + " avec positionCollision = " + str(pointCollision)
+        print "COLLISION dans " + str(temps) + " avec positionCollision = (%.2f, %.2f)" % (pointCollision[0], pointCollision[1])
         #print self.joueurs.items()
         reactor.callLater(temps, self.choisirTrajectoire, pointCollision, angle)
         

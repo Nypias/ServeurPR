@@ -121,7 +121,7 @@ class Joueur(WebSocketHandler):
         self.sendAll(msg)
     
     def decode(self, msg):
-        #print "Message reçu : \n%s" % json.dumps(msg, indent = 2)
+        print "Message reçu : \n%s" % json.dumps(msg, indent = 2)
         if (msg["msg"] == "Hello"):
             self.msgHello(msg)
         elif (msg["msg"] == "Bouge"):
