@@ -23,10 +23,10 @@ class Trajectoire :
         #on tire de préférence à l'horizontale...
         petitangle = random.random()*45       
         dg = 180
-        if random.random() > 0,5:
+        if random.random() > 0.5:
             dg = 0
         hb = -1
-        if random.random() > 0,5:
+        if random.random() > 0.5:
             hb = 1
         angle = dg + hb*petitangle
         
