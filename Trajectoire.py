@@ -22,8 +22,8 @@ class Trajectoire :
         # for multiplayer mode
         self.Xfield = [50,90] # list of the ordinate starting with the field center and next the field corners
         self.Yfield = [50,50] # list of the abscissa ...
-        self.Xball = [90,0] 
-        self.Yball = [50,0]
+        self.Xball = [0,90] 
+        self.Yball = [random.random()*40 + 30,50]
         
         time = 0
         angle = random.random()*360
@@ -120,8 +120,76 @@ class Trajectoire :
                 self.Yfield.append(50 + 40*math.sin(angle*i))
                 i = i + 1
             print "Terrain multi-joueur créé"
+            # throw the ball
+            pointCollision = (self.Xball[1], self.Yball[1])
+            self.sendPoint(pointCollision,time)
+            self.multi_get_new_point(0)
             
+    def multi_collision(self, nb_player):
+    # send back 1 if collision 0 if the player lose the game
+        # we test if the player is close enought(depending on the raquette size) to the ball impact
+        i = 0
+        # determination of abscissa and odonate of the raquette center
+        Xraquette = Xfield[nb_player]*self.joueurs[nb_player].raquette + Xfield[nb_player+1]*(1-self.joueurs[nb_player].raquette)
+        Yraquette = Yfield[nb_player]*self.joueurs[nb_player].raquette + Yfield[nb_player+1]*(1-self.joueurs[nb_player].raquette)
+        # i did the arbitrary choise of a 16% lenght raquette regarding the size of the player segment that's why: 8^2 is used
+        if ( (self.Xball[len(self.Xball)-1]-Xraquette)^2+(self.Yball[len(self.Yball)-1]-Yraquette)^2 ) < 8^2:
+            self.multi_get_new_point(self, nb_player)		
+            print "COLLISION sur la raquette du joueur " + nb_player
+        else:
+            print nb_player + "looser"
+
+    def multi_get_new_point(self, nb_sender):
+	 
+        # création of the vector before collision
+        A = self.Xball[1]-self.Xball[0]
+        B = self.Yball[1]-self.Yball[0]
+        a_before = A/(A+B)
+        b_before = B/(A+B)
             
+        # création of the collided line
+        A = self.Xfield[nb_sender] - self.Xfield[nb_sender+1]
+        B = self.Yfield[nb_sender] - self.Yfield[nb_sender+1]
+        a_border = A/(A+B)
+        b_border = B/(A+B)
+            
+        # création of the new trajectory
+        scalar_product_border = a_before*a_border + b_before*b_border # to get the pojection on the border
+        # in order to build the correct perpendicular unit vector to project the second part of the _before vector you have to understand that
+        # the field is build in the counterclockwise (sens trigonometrique) so a -PI/2 rotation from _border vector is needed.
+        a_perpendicular = - a_border
+        b_perpendicular = b_border
+        scalar_product_perpendicular = a_before*a_perpendicular + b_before*b_perpendicular
+        a_after = a_border*scalar_product_border - a_perpendicular*scalar_product_perpendicular
+        b_after = b_border*scalar_product_border - b_perpendicular*scalar_product_perpendicular
+
+        #for each player we look for intersect between this new trajectory and a player segment
+        i = 1
+        while i < self.jeu.nbJoueurs:
+            if i != nb_player:
+                # création of the line supporting the player segment
+                A = self.Xfield[i]-self.Xfield[i+1]
+                B = self.Yfield[i]-self.Yfield[i+1]
+                a_intersect_line = A/(A+B)
+                b_intersect_line = B/(A+B)
+                # determination of the intersection point
+                Xintersect = (self.Yfield[nb_player] - self.Yball[len(self.Yball)-1] - (self.Xfield[nb_player]*b_intersect_line/a_intersect_line) + (self.Xball[len(self.Xball)-1]*b_after/a_after) ) / ( b_after/a_after - b_intersect_line/a_intersect_line)
+                Yintersect = self.Yfield[nb_player] + (Xintersect-self.Xfield[nb_player])*b_intersect_line/a_intersect_line
+                # is this intersection point in the player segment ?
+                if ( (self.Xfield[nb_player]<=intersect and intersect<=self.Xfield[nb_player+1]) or (self.Xfield[nb_player+1]<=intersect and intersect<=self.Xfield[nb_player]) ) and ( (self.Yfield[nb_player]<=intersect and intersect<=self.Yfield[nb_player+1]) or (self.Yfield[nb_player+1]<=intersect and intersect<=self.Yfield[nb_player]) ):
+                    # if yes then set the news X,Yball
+                    Xball[0] = Xball[1]
+                    Xball[1] = Xintersection
+                    Yball[0] = Yball[1]
+                    Yball[1] = Yintersection
+                    self.multi_time_calculation(self, i)
+                    i = self.jeu.nbJoueurs # to end the loop
+
+
+    def multi_time_calculation(self, nb_player):
+        # calculate the time to cross the distance between the two ball coordinates and call the reactor
+        time = math.sqrt((self.Xball[0]-self.Xball[1])^2 + (self.Yball[0]-self.Yball[1])^2)
+        reactor.callLater(time, self.multi_get_new_point, pointCollision, angle)        
         
         
         
