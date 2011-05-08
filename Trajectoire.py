@@ -19,7 +19,7 @@ class Trajectoire :
         self.jeu = jeu;
         self.joueurs = self.jeu.joueurs
         
-        time = 0
+        temps = 0
         angle = random.random()*360
         self.ball = [50, 50]
         self.ball[0] = self.ball[0] + math.cos(math.radians(angle))
@@ -34,19 +34,19 @@ class Trajectoire :
         # result
         self.ball[0] = self.ball[0] + u*math.cos(math.radians(angle))
         self.ball[1] = self.ball[1] - u*math.sin(math.radians(angle))
-        time = u * Trajectoire.TIME_INT
+        temps = u * Trajectoire.TIME_INT
         
         pointCollision = (self.ball[0], self.ball[1])
 		
-        print "COLLISION dans " + str(time) + " avec positionCollision = " + str(pointCollision)
+        print "COLLISION dans " + str(temps) + " avec positionCollision = " + str(pointCollision)
 		
-        self.sendPoint(pointCollision,time)
-        reactor.callLater(time, self.choisirTrajectoire, pointCollision, angle)
+        self.sendPoint(pointCollision,temps)
+        reactor.callLater(temps, self.choisirTrajectoire, pointCollision, angle)
      
     def sendPoint(self, point,temps):
         
         for client in self.jeu.getJoueurs():
-                message = { "msg" : "Trajectoire", "point" : (point,client.getHourClient() + temps)}
+                message = { "msg" : "Trajectoire", "point" : (point,client.getHourClient() + temps*1000)}
                 client.transport.write(json.dumps(message))
 
     def choisirTrajectoire(self, pointDepart, angle):
@@ -83,7 +83,7 @@ class Trajectoire :
               self.genererTrajectoire((50,50),0) # generation nouvelle trajectoire à partir du point initial
         
     def genererTrajectoire(self, pointDepart, angle):
-        time = 0
+        temps = 0
         if pointDepart == (50,50):
             angle = random.random()*360
         self.ball = list(pointDepart)
@@ -94,7 +94,7 @@ class Trajectoire :
         #    self.ball[0] = self.ball[0] + math.cos(math.radians(angle))
         #    self.ball[1] = self.ball[1] - math.sin(math.radians(angle))
         #    #print self.ball[0], self.ball[1]
-        #    time += Trajectoire.TIME_INT # "-" car l'axe des Y est vers le bas
+        #    temps += Trajectoire.TIME_INT # "-" car l'axe des Y est vers le bas
         #self.ball[0] = self.ball[0]
         #self.ball[1] = self.ball[1]
         
@@ -110,15 +110,14 @@ class Trajectoire :
         # result
         self.ball[0] = self.ball[0] + u*math.cos(math.radians(angle))
         self.ball[1] = self.ball[1] - u*math.sin(math.radians(angle))
-        time = u * Trajectoire.TIME_INT
+        temps = u * Trajectoire.TIME_INT
         
         pointCollision = (self.ball[0], self.ball[1])
+        self.sendPoint(pointCollision,temps)
         
-        self.sendPoint(pointCollision,time)
-        
-        print "COLLISION dans " + str(time) + " avec positionCollision = " + str(pointCollision)
+        print "COLLISION dans " + str(temps) + " avec positionCollision = " + str(pointCollision)
         #print self.joueurs.items()
-        reactor.callLater(time, self.choisirTrajectoire, pointCollision, angle)
+        reactor.callLater(temps, self.choisirTrajectoire, pointCollision, angle)
         
         
         

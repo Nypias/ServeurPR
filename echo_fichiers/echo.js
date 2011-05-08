@@ -126,7 +126,9 @@
 
   function onMessage(evt)
   {
-    logToConsole('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>');
+	d = new Date();
+	
+    logToConsole('<span style="color: blue;">RESPONSE: ' + d.getTime() + evt.data+'</span>');
   }
 
   function onError(evt)
