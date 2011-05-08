@@ -11,7 +11,7 @@ transformer la trajectoire en string JSON """
 class Trajectoire :
     
     TAILLE_RAQ = 20 #taille de la raquette entre 0 et 100 (en pourcentage)
-    TIME_INT = 0.0005 #vitesse (sans unité particulière) de la balle
+    TIME_INT = 0.03 #vitesse (sans unité particulière) de la balle
     
 
     def __init__(self, jeu):
@@ -68,7 +68,6 @@ class Trajectoire :
                 print "rebondSurRaquette SUR RAQUETTE"
                 # TODO : envoyer un message Collision avec STATUS = "HIT" + Gstat
         
-        print axeJoueur
         if (not axeJoueur) or (rebondSurRaquette) :
             
             if (self.ball[0] == 0 or self.ball[0] == 100 ) and (self.ball[1] == 0 or self.ball[1]==100 ):
