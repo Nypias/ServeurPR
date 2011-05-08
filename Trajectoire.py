@@ -94,16 +94,29 @@ class Trajectoire :
             angle = random.random()*360
         self.ball = list(pointDepart)
         
-
         self.ball[0] = self.ball[0] + math.cos(math.radians(angle))
-        self.ball[1] = self.ball[1] - math.sin(math.radians(angle)) # "-" car l'axe des Y est vers le bas
-        while(self.ball[0] > 0 and self.ball[0] < 100 and self.ball[1] > 0 and self.ball[1] < 100):
-            self.ball[0] = self.ball[0] + math.cos(math.radians(angle))
-            self.ball[1] = self.ball[1] - math.sin(math.radians(angle))
-            #print self.ball[0], self.ball[1]
-            time += Trajectoire.TIME_INT # "-" car l'axe des Y est vers le bas
-        self.ball[0] = self.ball[0]
-        self.ball[1] = self.ball[1]
+        self.ball[1] = self.ball[1] - math.sin(math.radians(angle)) 
+        #while(self.ball[0] > 0 and self.ball[0] < 100 and self.ball[1] > 0 and self.ball[1] < 100):
+        #    self.ball[0] = self.ball[0] + math.cos(math.radians(angle))
+        #    self.ball[1] = self.ball[1] - math.sin(math.radians(angle))
+        #    #print self.ball[0], self.ball[1]
+        #    time += Trajectoire.TIME_INT # "-" car l'axe des Y est vers le bas
+        #self.ball[0] = self.ball[0]
+        #self.ball[1] = self.ball[1]
+        
+        # faster algo
+        # determination of the shortest length to face a wall 
+        u = (- self.ball[0]) / math.cos(math.radians(angle))
+        if u<0:
+            u = (100 - self.ball[0]) / math.cos(math.radians(angle))            
+        v = self.ball[1] / math.sin(math.radians(angle)) 
+        if v<0:
+            v = (self.ball[1] - 100) / math.sin(math.radians(angle))
+        u = min(u,v)
+        # result
+        self.ball[0] = self.ball[0] + u*math.cos(math.radians(angle))
+        self.ball[1] = self.ball[1] - u*math.sin(math.radians(angle))
+        time = u * Trajectoire.TIME_INT
         
         pointCollision = (self.ball[0], self.ball[1])
         
