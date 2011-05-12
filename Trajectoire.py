@@ -3,10 +3,14 @@ import random, math
 
 import json
 
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 """ Méthode de calcul de trajectoire, doit implémenter une méthode pour
 transformer la trajectoire en string JSON """
 
+#def sleep(secs):
+#    d = defer.Deferred()
+#    reactor.callLater(secs, d.callback, None)
+#    return d
 
 class Trajectoire :
     
@@ -19,7 +23,8 @@ class Trajectoire :
         self.jeu = jeu
         self.joueurs = self.jeu.joueurs
         
-        #self.sendPoint((50,50), 2)
+#        self.sendPoint((50,50), 2)
+#        sleep(2)
         
         
         temps = 0

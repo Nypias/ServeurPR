@@ -91,7 +91,6 @@ class Joueur(WebSocketHandler):
         self.name = msg["pseudo"]
         self.offset = self.calcOffset(msg["time"])
         #quand un client se connecte, on le dit à tout le monde
-        print "Envoi du GStat suite à la reception du Hello"
         self.msgGstat()
         #quand un client se connecte, le serveur lui envoie un SyncJ pour qu'il connaisse les raquettes des autres
         self.msgSyncJ()
@@ -122,6 +121,7 @@ class Joueur(WebSocketHandler):
             msg["players"][client.name]["points"] = client.score
             msg["players"][client.name]["axe"] = client.axe
         self.sendAll(msg)
+        print "Gstat envoyé : " + json.dumps(msg)
     
     def decode(self, msg):
         print "Message reçu : \n%s" % json.dumps(msg, indent = 2)
