@@ -98,7 +98,14 @@ class Trajectoire :
     def genererTrajectoire(self, pointDepart, angle):
         temps = 0
         if pointDepart == (50,50):
-            angle = random.random()*360
+            petitangle = random.random()*45
+            dg = 180
+            if random.random() > 0.5:
+                dg = 0
+            hb = -1
+            if random.random() > 0.5:
+                hb = 1
+            angle = dg + hb*petitangle
         self.ball = list(pointDepart)
         
         #while(self.ball[0] > 0 and self.ball[0] < 100 and self.ball[1] > 0 and self.ball[1] < 100):
