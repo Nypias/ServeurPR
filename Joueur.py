@@ -82,7 +82,7 @@ class Joueur(WebSocketHandler):
             msg["status"] = "HIT"
         else:
             msg["status"] = "MISS"
-            print "PAquet MISS"
+            print "Paquet MISS"
         self.sendAll(msg)
         
 
@@ -91,6 +91,7 @@ class Joueur(WebSocketHandler):
         self.name = msg["pseudo"]
         self.offset = self.calcOffset(msg["time"])
         #quand un client se connecte, on le dit à tout le monde
+        print "Envoi du GStat suite à la reception du Hello"
         self.msgGstat()
         #quand un client se connecte, le serveur lui envoie un SyncJ pour qu'il connaisse les raquettes des autres
         self.msgSyncJ()

@@ -19,6 +19,9 @@ class Trajectoire :
         self.jeu = jeu
         self.joueurs = self.jeu.joueurs
         
+        #self.sendPoint((50,50), 2)
+        
+        
         temps = 0
         angle = random.random()*360
         self.ball = [50, 50]
@@ -37,9 +40,10 @@ class Trajectoire :
         pointCollision = (self.ball[0], self.ball[1])
 		
         print "COLLISION dans " + str(temps) + " avec positionCollision = " + str(pointCollision)
-		
+	
+        
         self.sendPoint(pointCollision,temps)
-        reactor.callLater(temps, self.choisirTrajectoire, pointCollision, angle)
+        self.delay = reactor.callLater(temps, self.choisirTrajectoire, pointCollision, angle)
      
     def sendPoint(self, point,temps):
         
@@ -117,7 +121,15 @@ class Trajectoire :
         
         print "COLLISION dans " + str(temps) + " avec positionCollision = (%.2f, %.2f)" % (pointCollision[0], pointCollision[1])
         #print self.joueurs.items()
-        reactor.callLater(temps, self.choisirTrajectoire, pointCollision, angle)
+        self.delay = reactor.callLater(temps, self.choisirTrajectoire, pointCollision, angle)
+        
+    def __delete__(self):
+            try: 
+                self.delay.cancel() # Problème récurrent avec les delay.cancel() en Twisted : un cancel sur un delay non en cours lève
+                                    # une exception
+            except:
+                pass
+                
         
         
         

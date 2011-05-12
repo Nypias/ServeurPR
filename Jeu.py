@@ -14,12 +14,14 @@ class Jeu(WebSocketSite):
     def __init__(self, resource):
         WebSocketSite.__init__(self, resource)
         self.joueurs = { 0 : None , 1 : None} 
-        trajectoire = Trajectoire(self)
+        self.trajectoire = Trajectoire(self)
         
     def ajouterJoueur(self,joueur):
         for numAxe in self.joueurs.keys():
             if self.joueurs[numAxe] == None:
                 self.joueurs[numAxe] = joueur
+                self.trajectoire.__delete__()
+                self.trajectoire = Trajectoire(self)
                 break			    
         else:
             print "Nombre max de joueurs atteints"
