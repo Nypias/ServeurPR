@@ -7,10 +7,6 @@ from twisted.internet import reactor, defer
 """ Méthode de calcul de trajectoire, doit implémenter une méthode pour
 transformer la trajectoire en string JSON """
 
-#def sleep(secs):
-#    d = defer.Deferred()
-#    reactor.callLater(secs, d.callback, None)
-#    return d
 
 class Trajectoire :
     
@@ -23,8 +19,6 @@ class Trajectoire :
         self.jeu = jeu
         self.joueurs = self.jeu.joueurs
         
-#        self.sendPoint((50,50), 2)
-#        sleep(2)
         
         
         temps = 0
@@ -137,13 +131,13 @@ class Trajectoire :
         #print self.joueurs.items()
         self.delay = reactor.callLater(temps, self.choisirTrajectoire, pointCollision, angle)
         
-    def __delete__(self):
-            try: 
+    def stop(self):
+            if self.delay.active():
                 self.delay.cancel() # Problème récurrent avec les delay.cancel() en Twisted : un cancel sur un delay non en cours lève
                                     # une exception
-            except:
-                pass
-                
+
+            print "TRAJECTOIRE DETRUITE"
+            
         
         
         
