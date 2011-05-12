@@ -23,26 +23,16 @@ class Joueur(WebSocketHandler):
         self.offset = 0
         #position (du centre) de la raquette sur son axe, entre 0 et 100
         self.raquette = 50
-        #numéro de l'axe sur lequel est la raquette du joueur (0 : raquette gauche, 1 : raquette droite)
-        #quand on est ici, ce nouveau joueur n'a pas encore été ajouté dans self.site.joueurs => +1
-        self.axe = len(self.site.joueurs) - self.site.joueurs.values().count(None)
-        #heure, en ms, à laquelle on a entendu parler de ce client pour la dernière fois, utilisé pour détecter les timeouts
-        self.lastTimeSeen = 0
-        #on intialise cette valeur
-        self.setAlive()
-        #on va créer une boucle pour tester si le joueur est alive, avant on regarde si on n'a pas déjà créé cette boucle
-        #en fait on la crée une seule fois, quand le premier client se connecte
-        if (not hasattr(self.site, "pingLoop")):
-            #on définit un appel en boucle de isAlive avec comme paramètre self
-            self.site.pingLoop = task.LoopingCall(Joueur.isAlive, self)
-            #elle se déclenche toutes les secondes
-            self.site.pingLoop.start(1.0)
+        
         
     def __del__(self):
         print 'Deleting handler'
+        
+    def reset(self):
+        self.score = 0
 
     def sendAll(self, msg):
-		for client in self.site.getJoueurs():
+		for client in self.jeu.getJoueurs():
 			client.send(msg)
 
     def send(self, msgJSON):
@@ -57,7 +47,7 @@ class Joueur(WebSocketHandler):
         return (self.offset +  time.time()*1000)
 
     def isAlive(self):
-        for client in self.site.getJoueurs():
+        for client in self.jeu.getJoueurs():
 			#si on n'a pas entendu parler du client depuis plus de TIMEOUT secondes
 			if ((time.time()*1000 - client.lastTimeSeen) > (self.TIMEOUT*1000)):
 				print "%s is offline (timeout) !" % client.name
@@ -82,7 +72,6 @@ class Joueur(WebSocketHandler):
             msg["status"] = "HIT"
         else:
             msg["status"] = "MISS"
-            print "Paquet MISS"
         self.sendAll(msg)
         
 
@@ -104,7 +93,7 @@ class Joueur(WebSocketHandler):
         msg = {}
         msg["msg"] = "SyncJ"
         msg["raquettes"] = {}
-        for client in self.site.getJoueurs():
+        for client in self.jeu.getJoueurs():
             msg["raquettes"][client.name] = client.raquette
         self.sendAll(msg)
 
@@ -116,7 +105,7 @@ class Joueur(WebSocketHandler):
         msg = {}
         msg["msg"] = "GStat"
         msg["players"] = {}
-        for client in self.site.getJoueurs():
+        for client in self.jeu.getJoueurs():
             msg["players"][client.name] = {}
             msg["players"][client.name]["points"] = client.score
             msg["players"][client.name]["axe"] = client.axe
@@ -124,7 +113,7 @@ class Joueur(WebSocketHandler):
         print "Gstat envoyé : " + json.dumps(msg)
     
     def decode(self, msg):
-        print "Message reçu : \n%s" % json.dumps(msg, indent = 2)
+        #print "Message reçu : \n%s" % json.dumps(msg, indent = 2)
         if (msg["msg"] == "Hello"):
             self.msgHello(msg)
         elif (msg["msg"] == "Bouge"):
@@ -143,10 +132,24 @@ class Joueur(WebSocketHandler):
        
     def connectionMade(self):
         print 'Connected to client.'
-        self.site.ajouterJoueur(self)
+        self.site.ajouterJoueurDansJeu(self)
+        #numéro de l'axe sur lequel est la raquette du joueur (0 : raquette gauche, 1 : raquette droite)
+        #quand on est ici, ce nouveau joueur n'a pas encore été ajouté dans self.jeu.joueurs => +1
+        self.axe = len(self.jeu.joueurs) - self.jeu.joueurs.values().count(None)
+        #heure, en ms, à laquelle on a entendu parler de ce client pour la dernière fois, utilisé pour détecter les timeouts
+        self.lastTimeSeen = 0
+        #on intialise cette valeur
+        self.setAlive()
+        #on va créer une boucle pour tester si le joueur est alive, avant on regarde si on n'a pas déjà créé cette boucle
+        #en fait on la crée une seule fois, quand le premier client se connecte
+        if (not hasattr(self.jeu, "pingLoop")):
+            #on définit un appel en boucle de isAlive avec comme paramètre self
+            self.jeu.pingLoop = task.LoopingCall(Joueur.isAlive, self)
+            #elle se déclenche toutes les secondes
+            self.jeu.pingLoop.start(1.0)
         
 
     def connectionLost(self, reason):
         print 'Lost connection.'
-        self.site.enleverJoueur(self)
+        self.jeu.enleverJoueur(self)
         self.msgGstat()

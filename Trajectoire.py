@@ -7,6 +7,7 @@ from twisted.internet import reactor, defer
 """ Méthode de calcul de trajectoire, doit implémenter une méthode pour
 transformer la trajectoire en string JSON """
 
+import Jeu
 
 class Trajectoire :
     
@@ -47,7 +48,7 @@ class Trajectoire :
         
         pointCollision = (self.ball[0], self.ball[1])
 		
-        print "COLLISION dans " + str(temps) + " avec positionCollision = " + str(pointCollision)
+        #print "COLLISION dans " + str(temps) + " avec positionCollision = " + str(pointCollision)
 	
         
         self.sendPoint(pointCollision,temps)
@@ -78,7 +79,7 @@ class Trajectoire :
         if axeJoueur:
             if (joueur.raquette + Trajectoire.TAILLE_RAQ / 2) > self.ball[1] and (joueur.raquette - Trajectoire.TAILLE_RAQ / 2) < self.ball[1]:
                 rebondSurRaquette = True
-                print "rebondSurRaquette SUR RAQUETTE"
+                #print "rebondSurRaquette SUR RAQUETTE"
                 # TODO : envoyer un message Collision avec STATUS = "HIT" + Gstat
         
         if (not axeJoueur) or (rebondSurRaquette) :
@@ -134,7 +135,7 @@ class Trajectoire :
         pointCollision = (self.ball[0], self.ball[1])
         self.sendPoint(pointCollision,temps)
         
-        print "COLLISION dans " + str(temps) + " avec positionCollision = (%.2f, %.2f)" % (pointCollision[0], pointCollision[1])
+        #print "COLLISION dans " + str(temps) + " avec positionCollision = (%.2f, %.2f)" % (pointCollision[0], pointCollision[1])
         #print self.joueurs.items()
         self.delay = reactor.callLater(temps, self.choisirTrajectoire, pointCollision, angle)
         
@@ -143,7 +144,7 @@ class Trajectoire :
                 self.delay.cancel() # Problème récurrent avec les delay.cancel() en Twisted : un cancel sur un delay non en cours lève
                                     # une exception
 
-            print "TRAJECTOIRE DETRUITE"
+            #print "TRAJECTOIRE DETRUITE"
             
         
         

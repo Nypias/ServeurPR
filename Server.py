@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from Jeu import Jeu
+from Jeu import JeuFactory
 from Joueur import Joueur
 from twisted.web.static import File
 from websocket import *
@@ -13,7 +13,7 @@ if __name__ == "__main__":
     #WebSocketSite = une factory !
     #Simple() est une ressource
     root = File("../ClientPR/")
-    factory = Jeu(root)
+    factory = JeuFactory(root)
     factory.addHandler('/game', Joueur)
     reactor.listenTCP(8080, factory)
 
