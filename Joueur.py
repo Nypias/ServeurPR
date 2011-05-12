@@ -82,7 +82,9 @@ class Joueur(WebSocketHandler):
             msg["status"] = "HIT"
         else:
             msg["status"] = "MISS"
-        self.send(msg)
+            print "Paquet MISS"
+        self.sendAll(msg)
+        
 
     def msgHello(self, msg):
         #TODO il est interdit de faire un Hello une deuxième fois quand le joueur est déjà connecté : à détecter !
@@ -119,6 +121,7 @@ class Joueur(WebSocketHandler):
             msg["players"][client.name]["points"] = client.score
             msg["players"][client.name]["axe"] = client.axe
         self.sendAll(msg)
+        print "Gstat envoyé : " + json.dumps(msg)
     
     def decode(self, msg):
         print "Message reçu : \n%s" % json.dumps(msg, indent = 2)

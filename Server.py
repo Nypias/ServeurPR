@@ -12,15 +12,15 @@ if __name__ == "__main__":
 
     #WebSocketSite = une factory !
     #Simple() est une ressource
-    root = File(".")
+    root = File("../ClientPR/")
     factory = Jeu(root)
     factory.addHandler('/game', Joueur)
     reactor.listenTCP(8080, factory)
 
 
     print "launching reactor"
-    webbrowser.open("http://localhost:8080/echo.html")
-    webbrowser.open("http://localhost:8080/echo.html")
+    webbrowser.open("http://localhost:8080/pongroulette.html")
+#    webbrowser.open("http://localhost:8080/pongroulette.html")
     reactor.run()
     print "stop reactor"
 
