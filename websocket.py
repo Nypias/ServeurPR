@@ -355,7 +355,9 @@ class WebSocketTransport(object):
         @param frame: a I{UTF-8} encoded C{str} to send to the client.
         @type frame: C{str}
         """
+
         self._request.write("\x00%s\xff" % frame)
+
 
     def writeSequence(self, frames):
         """
@@ -469,6 +471,7 @@ class WebSocketFrameDecoder(object):
                 if frame[0] != "\x00":
                     self.request.transport.loseConnection()
                     break
+  
                 self.handler.frameReceived(frame[1:])
                 data = data[endIndex + 1:]
                 if not data:

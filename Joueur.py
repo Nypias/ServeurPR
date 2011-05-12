@@ -111,7 +111,7 @@ class Joueur(WebSocketHandler):
             msg["players"][client.name]["axe"] = client.axe
         self.sendAll(msg)
         print "Gstat envoyé : " + json.dumps(msg)
-    
+            
     def decode(self, msg):
         #print "Message reçu : \n%s" % json.dumps(msg, indent = 2)
         if (msg["msg"] == "Hello"):
@@ -133,9 +133,6 @@ class Joueur(WebSocketHandler):
     def connectionMade(self):
         print 'Connected to client.'
         self.site.ajouterJoueurDansJeu(self)
-        #numéro de l'axe sur lequel est la raquette du joueur (0 : raquette gauche, 1 : raquette droite)
-        #quand on est ici, ce nouveau joueur n'a pas encore été ajouté dans self.jeu.joueurs => +1
-        self.axe = len(self.jeu.joueurs) - self.jeu.joueurs.values().count(None)
         #heure, en ms, à laquelle on a entendu parler de ce client pour la dernière fois, utilisé pour détecter les timeouts
         self.lastTimeSeen = 0
         #on intialise cette valeur

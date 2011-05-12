@@ -19,8 +19,8 @@ if __name__ == "__main__":
 
 
     print "launching reactor"
-    webbrowser.open("http://localhost:8080/pongroulette.html")
-#    webbrowser.open("http://localhost:8080/pongroulette.html")
+    #webbrowser.open("http://localhost:8080/pongroulette.html")
+    #webbrowser.open("http://localhost:8080/pongroulette.html")
     reactor.run()
     print "stop reactor"
 
