@@ -20,7 +20,8 @@ class Jeu(WebSocketSite):
         for numAxe in self.joueurs.keys():
             if self.joueurs[numAxe] == None:
                 self.joueurs[numAxe] = joueur
-                self.trajectoire.__delete__()
+                self.trajectoire.stop()
+                del self.trajectoire
                 self.trajectoire = Trajectoire(self)
                 break			    
         else:
