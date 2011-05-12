@@ -33,9 +33,9 @@ class Trajectoire :
         angle = dg + hb*petitangle
         
         self.ball = [50, 50]
-        u = (2 - self.ball[0]) / math.cos(math.radians(angle))
+        u = (1.5 - self.ball[0]) / math.cos(math.radians(angle))
         if u<=0:
-            u = (98 - self.ball[0]) / math.cos(math.radians(angle))      
+            u = (98.5 - self.ball[0]) / math.cos(math.radians(angle))      
         v = self.ball[1] / math.sin(math.radians(angle))
         if v<=0:
             v = (self.ball[1] - 100) / math.sin(math.radians(angle))
@@ -65,12 +65,12 @@ class Trajectoire :
         axeJoueur = False
         rebondSurRaquette = False
         
-        if self.ball[0] <= 2: # axe 0
+        if self.ball[0] <= 1.5: # axe 0
             if self.joueurs[0] != None:
                 joueur = self.joueurs[0]
                 axeJoueur = True
                 
-        elif self.ball[0] >= 98: # axe 1
+        elif self.ball[0] >= 98.5: # axe 1
             if self.joueurs[1] != None:
                 joueur = self.joueurs[1]
                 axeJoueur = True
@@ -83,9 +83,9 @@ class Trajectoire :
         
         if (not axeJoueur) or (rebondSurRaquette) :
             
-            if (self.ball[0] == 2 or self.ball[0] == 98 ) and (self.ball[1] == 0 or self.ball[1]==100 ):
+            if (self.ball[0] == 1.5 or self.ball[0] == 98.5 ) and (self.ball[1] == 0 or self.ball[1]==100 ):
                 angle = 180 + angle
-            elif self.ball[0] <= 2 or self.ball[0] >= 98: #si x = 0 ou 100 => collision sur un bord vertical (// axe y) => a' = 180 - a
+            elif self.ball[0] <= 1.5 or self.ball[0] >= 98.5: #si x = 0 ou 100 => collision sur un bord vertical (// axe y) => a' = 180 - a
                 angle = 180 - angle
             elif (self.ball[1] <= 0 or self.ball[1] >= 100): #si y = 0 ou 100 => collision sur un bord horizontal (// axe x) => a' = - a
                 angle = 360 - angle
@@ -118,9 +118,9 @@ class Trajectoire :
         
         # faster algo
         # determination of the shortest length to face a wall 
-        u = (2 - self.ball[0]) / math.cos(math.radians(angle))
+        u = (1.5 - self.ball[0]) / math.cos(math.radians(angle))
         if u<=0:
-            u = (98 - self.ball[0]) / math.cos(math.radians(angle))      
+            u = (98.5 - self.ball[0]) / math.cos(math.radians(angle))      
         v = self.ball[1] / math.sin(math.radians(angle))
         if v<=0:
             v = (self.ball[1] - 100) / math.sin(math.radians(angle))
