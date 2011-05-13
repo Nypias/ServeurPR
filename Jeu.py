@@ -25,7 +25,7 @@ class JeuFactory(WebSocketSite):
                 joueur.jeu = jeu
                 joueur.axe = jeu.joueurs.values().index(None)
                 jeu.ajouterJoueur(joueur)
-                joueur.msgGstat()
+                joueur.msgGstat() # TODO : enlever ?
                 self.jeux.remove(jeu)
                 self.jeux.append(jeu)
                 break
@@ -35,7 +35,7 @@ class JeuFactory(WebSocketSite):
             joueur.jeu = jeu
             joueur.axe = jeu.joueurs.values().index(None)
             jeu.ajouterJoueur(joueur)
-            joueur.msgGstat()
+            joueur.msgGstat() # TODO : enlever ?
             self.jeux.append(jeu)
 
 
