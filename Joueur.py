@@ -64,6 +64,10 @@ class Joueur(WebSocketHandler):
         self.score -= 1
         self.msgCollision(False)
         self.msgGstat()
+        
+    def gagner(self):
+        self.score +=1
+        
 
     def msgCollision(self, hit):
         msg = {}

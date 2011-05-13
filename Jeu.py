@@ -78,7 +78,13 @@ class Jeu():
                     self.jeux.append(jeu)
                     break
             else:
-                joueur.msgGstat()
+                autreJoueur = self.joueurs[joueur.axe ^ 1]
+                if autreJoueur.axe == 1:
+                    self.joueurs[1]= None
+                    autreJoueur.axe =0
+                    self.joueurs[0] = autreJoueur
+                autreJoueur.msgGstat()
+                autreJoueur.msgSyncJ()
             
             
         

@@ -93,7 +93,7 @@ class Trajectoire :
             self.genererTrajectoire(pointDepart, angle) # generation nouvelle trajectoire à partir du point courant
         else :
               #print "JOUEUR LOSE"
-              joueur.perdre()
+              joueur.perdre()        
               self.genererTrajectoire((50,50),0) # generation nouvelle trajectoire à partir du point initial
         
     def genererTrajectoire(self, pointDepart, angle):
@@ -141,10 +141,8 @@ class Trajectoire :
         
     def stop(self):
             if self.delay.active():
-                self.delay.cancel() # Problème récurrent avec les delay.cancel() en Twisted : un cancel sur un delay non en cours lève
-                                    # une exception
-
-            #print "TRAJECTOIRE DETRUITE"
+                self.delay.cancel()
+                
             
         
         
