@@ -72,8 +72,14 @@ class Jeu():
                     joueurABouger.jeu = jeu
                     joueurABouger.axe = jeu.joueurs.values().index(None)
                     jeu.ajouterJoueur(joueurABouger)
+                    joueurABouger.msgGstat()
+                    joueurABouger.msgSyncJ()
                     self.jeux.remove(jeu)
                     self.jeux.append(jeu)
+                    break
+            else:
+                joueur.msgGstat()
+            
             
         
     def getJoueurs(self):

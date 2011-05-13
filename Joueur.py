@@ -96,6 +96,7 @@ class Joueur(WebSocketHandler):
         for client in self.jeu.getJoueurs():
             msg["raquettes"][client.name] = client.raquette
         self.sendAll(msg)
+        print "SyncJ envoyé : " + json.dumps(msg)
 
     def msgGstat(self):
         """ Envoi aux clients les informations sur tous les clients.
@@ -149,4 +150,3 @@ class Joueur(WebSocketHandler):
     def connectionLost(self, reason):
         print 'Lost connection.'
         self.jeu.enleverJoueur(self)
-        self.msgGstat()
