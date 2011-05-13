@@ -93,7 +93,9 @@ class Trajectoire :
             self.genererTrajectoire(pointDepart, angle) # generation nouvelle trajectoire à partir du point courant
         else :
               #print "JOUEUR LOSE"
-              joueur.perdre()        
+              joueur.perdre()
+              #if self.joueurs[joueur.axe ^ 1] != None: # autre joueur de la partie
+              #      self.joueurs[joueur.axe ^ 1].gagner()
               self.genererTrajectoire((50,50),0) # generation nouvelle trajectoire à partir du point initial
         
     def genererTrajectoire(self, pointDepart, angle):
