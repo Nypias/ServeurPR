@@ -12,7 +12,7 @@ import Jeu
 class Trajectoire :
     
     TAILLE_RAQ = 20 #taille de la raquette entre 0 et 100 (en pourcentage)
-    TIME_INT = 0.03 #vitesse (sans unité particulière) de la balle
+    TIME_INT = 0.025 #vitesse (sans unité particulière) de la balle
     
 
     def __init__(self, jeu):
@@ -93,9 +93,9 @@ class Trajectoire :
             self.genererTrajectoire(pointDepart, angle) # generation nouvelle trajectoire à partir du point courant
         else :
               #print "JOUEUR LOSE"
+              if self.joueurs[joueur.axe ^ 1] != None: # autre joueur de la partie
+                  self.joueurs[joueur.axe ^ 1].gagner()
               joueur.perdre()
-              #if self.joueurs[joueur.axe ^ 1] != None: # autre joueur de la partie
-              #      self.joueurs[joueur.axe ^ 1].gagner()
               self.genererTrajectoire((50,50),0) # generation nouvelle trajectoire à partir du point initial
         
     def genererTrajectoire(self, pointDepart, angle):

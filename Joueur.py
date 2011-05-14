@@ -65,8 +65,9 @@ class Joueur(WebSocketHandler):
         self.msgCollision(False)
         self.msgGstat()
         
-    #def gagner(self):
-        #self.score +=1
+    def gagner(self):
+        self.score +=1
+        
         
 
     def msgCollision(self, hit):
@@ -100,7 +101,7 @@ class Joueur(WebSocketHandler):
         for client in self.jeu.getJoueurs():
             msg["raquettes"][client.name] = client.raquette
         self.sendAll(msg)
-        print "SyncJ envoyé : " + json.dumps(msg)
+        #print "SyncJ envoyé : " + json.dumps(msg)
 
     def msgGstat(self):
         """ Envoi aux clients les informations sur tous les clients.
