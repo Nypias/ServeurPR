@@ -142,8 +142,7 @@ class Trajectoire :
         self.delay = reactor.callLater(temps, self.choisirTrajectoire, pointCollision, angle)
         
     def stop(self):
-            if self.delay.active():
-                self.delay.cancel()
+            self.delay.cancel()
                 
             
         
