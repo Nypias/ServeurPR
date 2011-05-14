@@ -36,7 +36,9 @@ class JeuFactory(WebSocketSite):
             jeu = Jeu(self.jeux)
             joueur.jeu = jeu
             joueur.axe = jeu.joueurs.values().index(None)
-            jeu.ajouterJoueur(joueur)
+            #jeu.ajouterJoueur(joueur)
+            jeu.joueurs[0] = joueur
+            jeu.trajectoire = Trajectoire(jeu)
             #joueur.msgGstat() # TODO : enlever ?
             self.jeux.append(jeu)
 
@@ -46,7 +48,7 @@ class Jeu():
     def __init__(self, jeux):
         self.joueurs = { 0 : None , 1 : None}
         self.jeux = jeux
-        self.trajectoire = Trajectoire(self)
+        #self.trajectoire = Trajectoire(self)
         
     def ajouterJoueur(self,joueur):
         for numAxe in self.joueurs.keys():
