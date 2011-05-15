@@ -55,9 +55,11 @@ class Jeu():
             if self.joueurs[numAxe] == None:
                 
                 self.joueurs[numAxe] = joueur
+                newPseudo = False
                 while joueur.name == self.joueurs[numAxe ^ 1].name:
+                    newPseudo = True
                     joueur.name += '1'
-                if joueur.name != "":
+                if joueur.name != "" and newPseudo:
                     joueur.msgNewPseudo(joueur.name)
                 self.trajectoire.stop()
                 del self.trajectoire
