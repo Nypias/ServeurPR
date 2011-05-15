@@ -8,6 +8,7 @@ from websocket import *
 from twisted.internet import task
 import json
 import time
+import random
 
 class Joueur(WebSocketHandler):
     TIMEOUT = 1000000 #durée maximum de présence sans mouvement
@@ -87,7 +88,7 @@ class Joueur(WebSocketHandler):
         if self.jeu.nbJoueurs() == 2:
             while (self.name == self.jeu.joueurs[self.axe^1].name):
                 newPseudo = True
-                self.name += '1'
+                self.name += str(random.randint(1, 9))
         if newPseudo:
             self.msgNewPseudo(self.name)
         self.offset = self.calcOffset(msg["time"])

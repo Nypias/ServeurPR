@@ -3,6 +3,8 @@
 from websocket import *
 from Trajectoire import Trajectoire
 
+import random
+
 """ Cette classe va gérer le jeu, càd conserver la liste des joueurs,
 gérer leurs points, et déclencher des calculs de trajectoire """
 
@@ -58,7 +60,7 @@ class Jeu():
                 newPseudo = False
                 while joueur.name == self.joueurs[numAxe ^ 1].name:
                     newPseudo = True
-                    joueur.name += '1'
+                    joueur.name += str(random.randint(1, 9))
                 if joueur.name != "" and newPseudo:
                     joueur.msgNewPseudo(joueur.name)
                 self.trajectoire.stop()
@@ -69,6 +71,7 @@ class Jeu():
     def enleverJoueur(self,joueur):
         
         self.joueurs[joueur.axe] = None
+        joueur.msgGstat()
         if self.nbJoueurs() == 0:
             self.trajectoire.stop()
             del self.trajectoire
