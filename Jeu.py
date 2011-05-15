@@ -57,6 +57,7 @@ class Jeu():
                 self.joueurs[numAxe] = joueur
                 while joueur.name == self.joueurs[numAxe ^ 1].name:
                     joueur.name += '1'
+                joueur.msgNewPseudo(joueur.name)
                 self.trajectoire.stop()
                 del self.trajectoire
                 self.trajectoire = Trajectoire(self)

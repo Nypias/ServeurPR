@@ -86,12 +86,19 @@ class Joueur(WebSocketHandler):
         if self.jeu.nbJoueurs() == 2:
             while (self.name == self.jeu.joueurs[self.axe^1].name):
                 self.name += '1'
-                
+        self.msgNewPseudo(self.name)
         self.offset = self.calcOffset(msg["time"])
         #quand un client se connecte, on le dit à tout le monde
         self.msgGstat()
         #quand un client se connecte, le serveur lui envoie un SyncJ pour qu'il connaisse les raquettes des autres
         self.msgSyncJ()
+        
+    def msgNewPseudo(self,pseudo):
+        msg = {}
+        msg["msg"] = "newPseudo"
+        msg["pseudo"] = pseudo
+        self.send(msg)
+        print "Msg newPseudo" + json.dumps(msg)
 
     def msgBouge(self, msg):
         #TODO déclencher erreur si n'est pas compris entre 0 et 100 : hack !
