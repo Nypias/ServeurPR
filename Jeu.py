@@ -53,7 +53,10 @@ class Jeu():
     def ajouterJoueur(self,joueur):
         for numAxe in self.joueurs.keys():
             if self.joueurs[numAxe] == None:
+                
                 self.joueurs[numAxe] = joueur
+                while joueur.name == self.joueurs[numAxe ^ 1].name:
+                    joueur.name += '1'
                 self.trajectoire.stop()
                 del self.trajectoire
                 self.trajectoire = Trajectoire(self)
