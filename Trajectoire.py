@@ -12,7 +12,7 @@ import Jeu
 class Trajectoire :
     
     TAILLE_RAQ = 20 #taille de la raquette entre 0 et 100 (en pourcentage)
-    TIME_INT = 0.03 #vitesse (sans unité particulière) de la balle
+    TIME_INT = 0.025 #vitesse (sans unité particulière) de la balle
     
 
     def __init__(self, jeu):
@@ -20,39 +20,8 @@ class Trajectoire :
         self.jeu = jeu
         self.joueurs = self.jeu.joueurs
         
-        
-        
-        temps = 0
-        #on tire de préférence à l'horizontale...
-        petitangle = random.random()*45       
-        dg = 180
-        if random.random() > 0.5:
-            dg = 0
-        hb = -1
-        if random.random() > 0.5:
-            hb = 1
-        angle = dg + hb*petitangle
-        
-        self.ball = [50, 50]
-        u = (1.5 - self.ball[0]) / math.cos(math.radians(angle))
-        if u<=0:
-            u = (98.5 - self.ball[0]) / math.cos(math.radians(angle))      
-        v = self.ball[1] / math.sin(math.radians(angle))
-        if v<=0:
-            v = (self.ball[1] - 100) / math.sin(math.radians(angle))
-        u = min(u,v)
-        # result
-        self.ball[0] = round(self.ball[0] + u*math.cos(math.radians(angle)),2)
-        self.ball[1] = round(self.ball[1] - u*math.sin(math.radians(angle)),2)
-        temps = u * Trajectoire.TIME_INT
-        
-        pointCollision = (self.ball[0], self.ball[1])
-		
-        #print "COLLISION dans " + str(temps) + " avec positionCollision = " + str(pointCollision)
-	
-        
-        self.sendPoint(pointCollision,temps)
-        self.delay = reactor.callLater(temps, self.choisirTrajectoire, pointCollision, angle)
+        self.delay = reactor.callLater(0.5, self.genererTrajectoire,(50,50), 0) # on commencera à generer la trajectoire 
+        # dans 0.5 secondes : cela permet de rendre la main au reactor et d'envoyer un message Gstat avant
      
     def sendPoint(self, point,temps):
         
@@ -93,9 +62,9 @@ class Trajectoire :
             self.genererTrajectoire(pointDepart, angle) # generation nouvelle trajectoire à partir du point courant
         else :
               #print "JOUEUR LOSE"
+              if self.joueurs[joueur.axe ^ 1] != None: # autre joueur de la partie
+                  self.joueurs[joueur.axe ^ 1].gagner()
               joueur.perdre()
-              #if self.joueurs[joueur.axe ^ 1] != None: # autre joueur de la partie
-              #      self.joueurs[joueur.axe ^ 1].gagner()
               self.genererTrajectoire((50,50),0) # generation nouvelle trajectoire à partir du point initial
         
     def genererTrajectoire(self, pointDepart, angle):
@@ -142,8 +111,7 @@ class Trajectoire :
         self.delay = reactor.callLater(temps, self.choisirTrajectoire, pointCollision, angle)
         
     def stop(self):
-            if self.delay.active():
-                self.delay.cancel()
+            self.delay.cancel()
                 
             
         

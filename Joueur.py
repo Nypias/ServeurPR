@@ -8,6 +8,7 @@ from websocket import *
 from twisted.internet import task
 import json
 import time
+import random
 
 class Joueur(WebSocketHandler):
     TIMEOUT = 1000000 #durée maximum de présence sans mouvement
@@ -26,7 +27,8 @@ class Joueur(WebSocketHandler):
         
         
     def __del__(self):
-        print 'Deleting handler'
+        #print 'Deleting handler'
+        pass
         
     def reset(self):
         self.score = 0
@@ -65,8 +67,9 @@ class Joueur(WebSocketHandler):
         self.msgCollision(False)
         self.msgGstat()
         
-    #def gagner(self):
-        #self.score +=1
+    def gagner(self):
+        self.score +=1
+        
         
 
     def msgCollision(self, hit):
@@ -81,12 +84,26 @@ class Joueur(WebSocketHandler):
 
     def msgHello(self, msg):
         #TODO il est interdit de faire un Hello une deuxième fois quand le joueur est déjà connecté : à détecter !
+        newPseudo = False
         self.name = msg["pseudo"]
+        if self.jeu.nbJoueurs() == 2:
+            while (self.name == self.jeu.joueurs[self.axe^1].name):
+                newPseudo = True
+                self.name += str(random.randint(1, 9))
+        if newPseudo:
+            self.msgNewPseudo(self.name)
         self.offset = self.calcOffset(msg["time"])
         #quand un client se connecte, on le dit à tout le monde
         self.msgGstat()
         #quand un client se connecte, le serveur lui envoie un SyncJ pour qu'il connaisse les raquettes des autres
         self.msgSyncJ()
+        
+    def msgNewPseudo(self,pseudo):
+        msg = {}
+        msg["msg"] = "newPseudo"
+        msg["pseudo"] = pseudo
+        self.send(msg)
+        #print "Msg newPseudo" + json.dumps(msg)
 
     def msgBouge(self, msg):
         #TODO déclencher erreur si n'est pas compris entre 0 et 100 : hack !
@@ -136,7 +153,7 @@ class Joueur(WebSocketHandler):
         
        
     def connectionMade(self):
-        print 'Connected to client.'
+        #print 'Connected to client.'
         self.site.ajouterJoueurDansJeu(self)
         #heure, en ms, à laquelle on a entendu parler de ce client pour la dernière fois, utilisé pour détecter les timeouts
         self.lastTimeSeen = 0
@@ -152,5 +169,5 @@ class Joueur(WebSocketHandler):
         
 
     def connectionLost(self, reason):
-        print 'Lost connection.'
+        #print 'Lost connection.'
         self.jeu.enleverJoueur(self)

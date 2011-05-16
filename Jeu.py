@@ -3,6 +3,8 @@
 from websocket import *
 from Trajectoire import Trajectoire
 
+import random
+
 """ Cette classe va gérer le jeu, càd conserver la liste des joueurs,
 gérer leurs points, et déclencher des calculs de trajectoire """
 
@@ -26,6 +28,8 @@ class JeuFactory(WebSocketSite):
                 joueur.jeu = jeu
                 joueur.axe = jeu.joueurs.values().index(None)
                 jeu.ajouterJoueur(joueur)
+                
+                
                 #joueur.msgGstat() # TODO : enlever ?
                 self.jeux.remove(jeu)
                 self.jeux.append(jeu)
@@ -35,7 +39,9 @@ class JeuFactory(WebSocketSite):
             jeu = Jeu(self.jeux)
             joueur.jeu = jeu
             joueur.axe = jeu.joueurs.values().index(None)
-            jeu.ajouterJoueur(joueur)
+            #jeu.ajouterJoueur(joueur)
+            jeu.joueurs[0] = joueur
+            jeu.trajectoire = Trajectoire(jeu)
             #joueur.msgGstat() # TODO : enlever ?
             self.jeux.append(jeu)
 
@@ -45,12 +51,19 @@ class Jeu():
     def __init__(self, jeux):
         self.joueurs = { 0 : None , 1 : None}
         self.jeux = jeux
-        self.trajectoire = Trajectoire(self)
+        #self.trajectoire = Trajectoire(self)
         
     def ajouterJoueur(self,joueur):
         for numAxe in self.joueurs.keys():
             if self.joueurs[numAxe] == None:
+                
                 self.joueurs[numAxe] = joueur
+                newPseudo = False
+                while joueur.name == self.joueurs[numAxe ^ 1].name:
+                    newPseudo = True
+                    joueur.name += str(random.randint(1, 9))
+                if joueur.name != "" and newPseudo:
+                    joueur.msgNewPseudo(joueur.name)
                 self.trajectoire.stop()
                 del self.trajectoire
                 self.trajectoire = Trajectoire(self)
@@ -59,6 +72,7 @@ class Jeu():
     def enleverJoueur(self,joueur):
         
         self.joueurs[joueur.axe] = None
+        joueur.msgGstat()
         if self.nbJoueurs() == 0:
             self.trajectoire.stop()
             del self.trajectoire
@@ -82,10 +96,13 @@ class Jeu():
                     break
             else:
                 autreJoueur = self.joueurs[joueur.axe ^ 1]
-                if autreJoueur.axe == 1:
-                    self.joueurs[1]= None
-                    autreJoueur.axe =0
-                    self.joueurs[0] = autreJoueur
+                self.trajectoire.stop()
+                del self.trajectoire
+                self.trajectoire = Trajectoire(self)
+                #if autreJoueur.axe == 1:
+                #    self.joueurs[1]= None
+                #    autreJoueur.axe =0
+                #    self.joueurs[0] = autreJoueur
                 autreJoueur.msgGstat()
                 autreJoueur.msgSyncJ()
             
