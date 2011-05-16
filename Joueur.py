@@ -100,7 +100,7 @@ class Joueur(WebSocketHandler):
         for client in self.jeu.getJoueurs():
             msg["raquettes"][client.name] = client.raquette
         self.sendAll(msg)
-        print "SyncJ envoyé : " + json.dumps(msg)
+        #print "SyncJ envoyé : " + json.dumps(msg)
 
     def msgGstat(self):
         """ Envoi aux clients les informations sur tous les clients.
@@ -115,7 +115,7 @@ class Joueur(WebSocketHandler):
             msg["players"][client.name]["points"] = client.score
             msg["players"][client.name]["axe"] = client.axe
         self.sendAll(msg)
-        print "Gstat envoyé : " + json.dumps(msg)
+        #print "Gstat envoyé : " + json.dumps(msg)
             
     def decode(self, msg):
         #print "Message reçu : \n%s" % json.dumps(msg, indent = 2)

@@ -16,7 +16,8 @@ class JeuFactory(WebSocketSite):
         
     
     def ajouterJoueurDansJeu(self, joueur):
-        
+        print "nombre jeux %d" % len(self.jeux)
+        #print "hello"
         for jeu in self.jeux[:]: # [:] pour créer une copie temporaire de jeux : cela permet la modification de jeux
                                  # pendant l'itération
             if jeu.nbJoueurs() < 2:
