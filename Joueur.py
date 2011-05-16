@@ -27,7 +27,8 @@ class Joueur(WebSocketHandler):
         
         
     def __del__(self):
-        print 'Deleting handler'
+        #print 'Deleting handler'
+        pass
         
     def reset(self):
         self.score = 0
@@ -102,7 +103,7 @@ class Joueur(WebSocketHandler):
         msg["msg"] = "newPseudo"
         msg["pseudo"] = pseudo
         self.send(msg)
-        print "Msg newPseudo" + json.dumps(msg)
+        #print "Msg newPseudo" + json.dumps(msg)
 
     def msgBouge(self, msg):
         #TODO déclencher erreur si n'est pas compris entre 0 et 100 : hack !
@@ -131,7 +132,7 @@ class Joueur(WebSocketHandler):
             msg["players"][client.name]["points"] = client.score
             msg["players"][client.name]["axe"] = client.axe
         self.sendAll(msg)
-        print "Gstat envoyé : " + json.dumps(msg)
+        #print "Gstat envoyé : " + json.dumps(msg)
             
     def decode(self, msg):
         #print "Message reçu : \n%s" % json.dumps(msg, indent = 2)
@@ -152,7 +153,7 @@ class Joueur(WebSocketHandler):
         
        
     def connectionMade(self):
-        print 'Connected to client.'
+        #print 'Connected to client.'
         self.site.ajouterJoueurDansJeu(self)
         #heure, en ms, à laquelle on a entendu parler de ce client pour la dernière fois, utilisé pour détecter les timeouts
         self.lastTimeSeen = 0
@@ -168,5 +169,5 @@ class Joueur(WebSocketHandler):
         
 
     def connectionLost(self, reason):
-        print 'Lost connection.'
+        #print 'Lost connection.'
         self.jeu.enleverJoueur(self)
