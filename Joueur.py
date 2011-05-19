@@ -88,7 +88,7 @@ class Joueur(WebSocketHandler):
         newPseudo = False
         if msg["pseudo"] == "":
             newPseudo = True
-            self.name = random.choice(["DSK","Nexus6","troll"])
+            self.name = random.choice(["DSK","DSK&MAIDS"])
         else:
             if len(msg["pseudo"]) >= 10:
                 self.name = msg["pseudo"][0:9]
