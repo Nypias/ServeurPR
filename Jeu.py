@@ -9,12 +9,28 @@ import random
 gérer leurs points, et déclencher des calculs de trajectoire """
 
 
+                
 class JeuFactory(WebSocketSite):
     
     
     def __init__(self, resource):
         WebSocketSite.__init__(self, resource)
         self.jeux = []
+        
+    def msgRoomStat(self):
+            msg = {}
+            msg["msg"] = "RoomsStats"
+            msg["rooms"] = len(self.jeux)
+            for jeu in self.jeux:
+                for joueur in jeu.getJoueurs():
+                    joueur.send(msg)
+                    
+    def msgRoomStatOnePlayer(self,joueur):
+        msg = {}
+        msg["msg"] = "RoomsStats"
+        msg["rooms"] = len(self.jeux)
+        joueur.send(msg)
+                
         
     
     def ajouterJoueurDansJeu(self, joueur):
@@ -28,14 +44,14 @@ class JeuFactory(WebSocketSite):
                 joueur.axe = jeu.joueurs.values().index(None)
                 jeu.ajouterJoueur(joueur)
                 
-                
                 #joueur.msgGstat() # TODO : enlever ?
                 self.jeux.remove(jeu)
                 self.jeux.append(jeu)
+                self.msgRoomStatOnePlayer(joueur)
                 break
             
         else:
-            jeu = Jeu(self.jeux)
+            jeu = Jeu(self)
             joueur.jeu = jeu
             joueur.axe = jeu.joueurs.values().index(None)
             #jeu.ajouterJoueur(joueur)
@@ -43,13 +59,16 @@ class JeuFactory(WebSocketSite):
             jeu.trajectoire = Trajectoire(jeu)
             #joueur.msgGstat() # TODO : enlever ?
             self.jeux.append(jeu)
-
+            self.msgRoomStat()
+        
+        
 
 class Jeu():
      
-    def __init__(self, jeux):
+    def __init__(self, site):
         self.joueurs = { 0 : None , 1 : None}
-        self.jeux = jeux
+        self.site = site
+        self.jeux = site.jeux
         #self.trajectoire = Trajectoire(self)
         
     def ajouterJoueur(self,joueur):
@@ -76,6 +95,7 @@ class Jeu():
             self.trajectoire.stop()
             del self.trajectoire
             self.jeux.remove(self)
+            self.site.msgRoomStat()
         elif self.nbJoueurs() == 1:
             # On va essayer de mettre le joueur resté seul dans une partie où un autre joueur est seul
             for jeu in self.jeux[:]:
@@ -92,6 +112,7 @@ class Jeu():
                     joueurABouger.msgSyncJ()
                     self.jeux.remove(jeu)
                     self.jeux.append(jeu)
+                    self.site.msgRoomStat()
                     break
             else:
                 autreJoueur = self.joueurs[joueur.axe ^ 1]
@@ -104,6 +125,7 @@ class Jeu():
                 #    self.joueurs[0] = autreJoueur
                 autreJoueur.msgGstat()
                 autreJoueur.msgSyncJ()
+                self.site.msgRoomStatOnePlayer(autreJoueur)
             
             
         

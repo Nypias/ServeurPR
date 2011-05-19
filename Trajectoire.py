@@ -19,8 +19,7 @@ class Trajectoire :
 
         self.jeu = jeu
         self.joueurs = self.jeu.joueurs
-        
-        self.delay = reactor.callLater(0.5, self.genererTrajectoire,(50,50), 0) # on commencera à generer la trajectoire 
+        self.delay = reactor.callLater(1 , self.genererTrajectoire,(50,50), 0) # on commencera à generer la trajectoire 
         # dans 0.5 secondes : cela permet de rendre la main au reactor et d'envoyer un message Gstat avant
      
     def sendPoint(self, point,temps):
@@ -65,7 +64,8 @@ class Trajectoire :
               if self.joueurs[joueur.axe ^ 1] != None: # autre joueur de la partie
                   self.joueurs[joueur.axe ^ 1].gagner()
               joueur.perdre()
-              self.genererTrajectoire((50,50),0) # generation nouvelle trajectoire à partir du point initial
+              self.delay = reactor.callLater(0.6, self.genererTrajectoire, (50,50), 0)
+              #self.genererTrajectoire((50,50),0) # generation nouvelle trajectoire à partir du point initial
         
     def genererTrajectoire(self, pointDepart, angle):
         temps = 0
