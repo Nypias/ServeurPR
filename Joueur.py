@@ -130,7 +130,10 @@ class Joueur(WebSocketHandler):
         msg["raquettes"] = {}
         for client in self.jeu.getJoueurs():
             msg["raquettes"][client.name] = client.raquette
-        self.sendAll(msg)
+        for client in self.jeu.getJoueurs():
+            if client != self:
+                client.send(msg)
+        
         #print "SyncJ envoyé : " + json.dumps(msg)
 
     def msgGstat(self):
