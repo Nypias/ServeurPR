@@ -15,6 +15,11 @@ class Joueur(WebSocketHandler):
     
     
     def __init__(self, transport):
+        #= True si joueur banni
+        self.ban = False
+        if transport.getPeer().host.find('134.214.') != -1:
+            self.ban = True
+            transport.loseConnection()
         WebSocketHandler.__init__(self, transport)
         #score du joueur
         self.score = 0
@@ -162,6 +167,7 @@ class Joueur(WebSocketHandler):
         
        
     def connectionMade(self):
+
         #print 'Connected to client.'
         self.site.ajouterJoueurDansJeu(self)
         #heure, en ms, à laquelle on a entendu parler de ce client pour la dernière fois, utilisé pour détecter les timeouts
@@ -179,4 +185,5 @@ class Joueur(WebSocketHandler):
 
     def connectionLost(self, reason):
         #print 'Lost connection.'
-        self.jeu.enleverJoueur(self)
+        if not self.ban:
+            self.jeu.enleverJoueur(self)
