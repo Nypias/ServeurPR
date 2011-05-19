@@ -38,10 +38,10 @@ class JeuFactory(WebSocketSite):
                 joueur.axe = jeu.joueurs.values().index(None)
                 jeu.ajouterJoueur(joueur)
                 
-                
                 #joueur.msgGstat() # TODO : enlever ?
                 self.jeux.remove(jeu)
                 self.jeux.append(jeu)
+                self.msgRoomStat()
                 break
             
         else:
