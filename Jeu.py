@@ -104,7 +104,6 @@ class Jeu():
                     self.trajectoire.stop()
                     del self.trajectoire
                     self.jeux.remove(self)
-                    self.site.msgRoomStat()
                     #joueurABouger.reset() A mettre si on veut que le joueur qui arrive dans une nouvelle partie ait un score de 0
                     joueurABouger.jeu = jeu
                     joueurABouger.axe = jeu.joueurs.values().index(None)
@@ -113,6 +112,7 @@ class Jeu():
                     joueurABouger.msgSyncJ()
                     self.jeux.remove(jeu)
                     self.jeux.append(jeu)
+                    self.site.msgRoomStat()
                     break
             else:
                 autreJoueur = self.joueurs[joueur.axe ^ 1]
