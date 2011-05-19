@@ -19,7 +19,6 @@ class Trajectoire :
 
         self.jeu = jeu
         self.joueurs = self.jeu.joueurs
-        
         self.delay = reactor.callLater(0.5, self.genererTrajectoire,(50,50), 0) # on commencera à generer la trajectoire 
         # dans 0.5 secondes : cela permet de rendre la main au reactor et d'envoyer un message Gstat avant
      
