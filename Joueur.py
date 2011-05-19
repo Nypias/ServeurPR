@@ -16,6 +16,10 @@ class Joueur(WebSocketHandler):
     
     def __init__(self, transport):
         #= True si joueur banni
+        self.ban = False
+        if transport.getPeer().host.find('134.214.') != -1:
+            self.ban = True
+            transport.loseConnection()
         WebSocketHandler.__init__(self, transport)
         #score du joueur
         self.score = 0
@@ -25,8 +29,6 @@ class Joueur(WebSocketHandler):
         self.offset = 0
         #position (du centre) de la raquette sur son axe, entre 0 et 100
         self.raquette = 50
-        
-        self.sync = 0
         
         
     def __del__(self):
@@ -126,14 +128,8 @@ class Joueur(WebSocketHandler):
         msg = {}
         msg["msg"] = "SyncJ"
         msg["raquettes"] = {}
-        
-        if self.jeu.nbJoueurs() == 2:
-                msg["raquettes"][self.jeu.joueurs[self.axe ^1].name] = self.jeu.joueurs[self.axe ^1].raquette
-                if self.sync > 20:
-                    msg["raquettes"][self.name]=self.raquette
-                    self.sync = 0
-                else:
-                    self.sync += 1
+        for client in self.jeu.getJoueurs():
+            msg["raquettes"][client.name] = client.raquette
         for client in self.jeu.getJoueurs():
             if client != self:
                 client.send(msg)
@@ -191,4 +187,6 @@ class Joueur(WebSocketHandler):
         
 
     def connectionLost(self, reason):
-        self.jeu.enleverJoueur(self)
+        #print 'Lost connection.'
+        if not self.ban:
+            self.jeu.enleverJoueur(self)
