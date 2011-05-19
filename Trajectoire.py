@@ -106,7 +106,7 @@ class Trajectoire :
         pointCollision = (self.ball[0], self.ball[1])
         self.sendPoint(pointCollision,temps)
         
-        #print "COLLISION dans " + str(temps) + " avec positionCollision = (%.2f, %.2f)" % (pointCollision[0], pointCollision[1])
+        print "COLLISION dans " + str(temps) + " avec positionCollision = (%.2f, %.2f)" % (pointCollision[0], pointCollision[1])
         #print self.joueurs.items()
         self.delay = reactor.callLater(temps, self.choisirTrajectoire, pointCollision, angle)
         

@@ -85,7 +85,15 @@ class Joueur(WebSocketHandler):
     def msgHello(self, msg):
         #TODO il est interdit de faire un Hello une deuxième fois quand le joueur est déjà connecté : à détecter !
         newPseudo = False
-        self.name = msg["pseudo"]
+        if msg["pseudo"] == "":
+            newPseudo = True
+            self.name = "DSK"
+        else:
+            if len(msg["pseudo"]) >= 10:
+                self.name = msg["pseudo"][0:9]
+                newPseudo = True
+            else:
+                self.name = msg["pseudo"]
         if self.jeu.nbJoueurs() == 2:
             while (self.name == self.jeu.joueurs[self.axe^1].name):
                 newPseudo = True

@@ -17,7 +17,7 @@ class GamePage(Resource):
         pageFile = open("../ClientPR/pongroulette.html")
         page = pageFile.read()
         page = page.replace("$PSEUDO$", cgi.escape(request.args["nomdujoueur"][0]))
-        pageFile.close()        
+        pageFile.close()
         return page
 
 
