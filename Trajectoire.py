@@ -94,7 +94,6 @@ class Trajectoire :
         self.ball[1] = round(self.ball[1] - u*math.sin(math.radians(angle)),2)
 
         temps = u * Trajectoire.TIME_INT 
-        Trajectoire.TIME_INT = Trajectoire.TIME_INT - 0.0001
         
         pointCollision = (self.ball[0], self.ball[1])
         self.sendPoint(pointCollision,temps)
