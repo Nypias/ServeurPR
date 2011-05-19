@@ -9,6 +9,37 @@ import webbrowser #TESTING purpose
 import cgi
 
 
+class StatsPage(Resource):
+    def __init__(self, factory):
+        self.factory = factory
+    
+    def render_GET(self, request):
+        page = """<style type='text/css'>
+            table {
+            border: medium solid #000000;
+            border-collapse : collapse;
+            width: 50%;
+            }
+            td, th {
+            border: thin solid #6495ed;
+            width: 50%;
+            }
+            th {
+            background-color : grey;
+            }
+        </style>"""
+        page += "<p>Nombre de salles : " + str(len(self.factory.jeux)) + "</p>"
+        for jeu in self.factory.jeux:
+            page += "<table><tr><th>Pseudo</th><th>Score</th><th>IP</th></tr>\n"
+            for joueur in jeu.getJoueurs():
+                ip = str(joueur.transport.getPeer().host)
+                page += "<tr>\n    <td>" + joueur.name +\
+                        "</td>\n    <td>" + str(joueur.score) +\
+                        "</td>\n    <td><a target=_blank href=\"http://www.dnswatch.info/dns/dnslookup?la=en&host=" + ip + "\">" + ip + "</a>" +\
+                        "</td>\n</tr>\n"
+            page += "</table>\n\n<br />"
+        return str(page)
+
 class GamePage(Resource):
     def render_GET(self, request):
         return '<a href="index.html">Aller a l\'accueil du jeu</a>'
@@ -29,6 +60,7 @@ if __name__ == "__main__":
     root = File("../ClientPR/")
     root.putChild("gamePage", GamePage())
     factory = JeuFactory(root)
+    root.putChild("stats", StatsPage(factory))
     factory.addHandler('/game', Joueur)
     reactor.listenTCP(8080, factory)
 
