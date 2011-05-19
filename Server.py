@@ -27,7 +27,9 @@ class StatsPage(Resource):
             th {
             background-color : grey;
             }
-        </style>"""
+        </style>
+        <body onload="setTimeout('window.location.reload()', 3000)">        
+        """
         page += "<p>Nombre de salles : " + str(len(self.factory.jeux)) + "</p>"
         for jeu in self.factory.jeux:
             page += "<table><tr><th>Pseudo</th><th>Score</th><th>IP</th></tr>\n"
