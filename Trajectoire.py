@@ -56,7 +56,7 @@ class Trajectoire :
                 angle = 180 + angle
             elif self.ball[0] <= 1.5 or self.ball[0] >= 98.5: #si x = 0 ou 100 => collision sur un bord vertical (// axe y) => a' = 180 - a
                 angle = 180 - angle
-            elif (self.ball[1] <= 0 or self.ball[1] >= 100): #si y = 0 ou 100 => collision sur un bord horizontal (// axe x) => a' = - a
+            elif (self.ball[1] <= 1 or self.ball[1] >= 99): #si y = 0 ou 100 => collision sur un bord horizontal (// axe x) => a' = - a
                 angle = 360 - angle
             self.genererTrajectoire(pointDepart, angle) # generation nouvelle trajectoire à partir du point courant
         else :
@@ -69,14 +69,14 @@ class Trajectoire :
     def genererTrajectoire(self, pointDepart, angle):
         temps = 0
         if pointDepart == (50,50):
-            petitangle = random.random()*45
+            petitangle = random.random()*35
             dg = 180
             if random.random() > 0.5:
                 dg = 0
             hb = -1
             if random.random() > 0.5:
                 hb = 1
-            angle = dg + hb*petitangle
+            angle = dg + hb*(petitangle+10)
         self.ball = list(pointDepart)
         
         #while(self.ball[0] > 0 and self.ball[0] < 100 and self.ball[1] > 0 and self.ball[1] < 100):
@@ -92,9 +92,9 @@ class Trajectoire :
         u = (1.5 - self.ball[0]) / math.cos(math.radians(angle))
         if u<=0:
             u = (98.5 - self.ball[0]) / math.cos(math.radians(angle))      
-        v = self.ball[1] / math.sin(math.radians(angle))
+        v = (self.ball[1] - 1) / math.sin(math.radians(angle))
         if v<=0:
-            v = (self.ball[1] - 100) / math.sin(math.radians(angle))
+            v = (self.ball[1] - 99) / math.sin(math.radians(angle))
         u = min(u,v)
         # result
         self.ball[0] = round(self.ball[0] + u*math.cos(math.radians(angle)),2)

@@ -88,7 +88,7 @@ class Joueur(WebSocketHandler):
         newPseudo = False
         if msg["pseudo"] == "":
             newPseudo = True
-            self.name = "DSK"
+            self.surprise()  
         else:
             if len(msg["pseudo"]) >= 10:
                 self.name = msg["pseudo"][0:9]
@@ -180,3 +180,26 @@ class Joueur(WebSocketHandler):
     def connectionLost(self, reason):
         #print 'Lost connection.'
         self.jeu.enleverJoueur(self)
+
+    def surprise(self):
+        numJoke = random.random() * 10
+        if numJoke < 1:
+            self.name = "DSK"
+        elif numJoke < 2:
+            self.name = "Fondation"
+        elif numJoke < 3:
+            self.name = "no name"
+        elif numJoke < 4:
+            self.name = "NEXUS6"
+        elif numJoke < 5:
+            self.name = "Mamie nova"
+        elif numJoke < 6:
+            self.name = "Papy moujo"
+        elif numJoke < 7:
+            self.name = "pupute"
+        elif numJoke < 8:
+            self.name = "troll"
+        elif numJoke < 9:
+            self.name = "double raimbow"
+        else:
+            self.name = "au Fond a Droite"
