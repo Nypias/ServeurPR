@@ -63,7 +63,8 @@ class Joueur(WebSocketHandler):
 
 
     def perdre(self):
-        self.score -= 1
+        if self.score > 0:
+            self.score -= 1
         self.msgCollision(False)
         self.msgGstat()
         
