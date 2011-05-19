@@ -24,6 +24,12 @@ class JeuFactory(WebSocketSite):
             for jeu in self.jeux:
                 for joueur in jeu.getJoueurs():
                     joueur.send(msg)
+                    
+    def msgRoomStatOnePlayer(self,joueur):
+        msg = {}
+        msg["msg"] = "RoomsStats"
+        msg["rooms"] = len(self.jeux)
+        joueur.send(msg)
                 
         
     
@@ -41,7 +47,7 @@ class JeuFactory(WebSocketSite):
                 #joueur.msgGstat() # TODO : enlever ?
                 self.jeux.remove(jeu)
                 self.jeux.append(jeu)
-                self.msgRoomStat()
+                self.msgRoomStatOnePlayer(joueur)
                 break
             
         else:
@@ -119,6 +125,7 @@ class Jeu():
                 #    self.joueurs[0] = autreJoueur
                 autreJoueur.msgGstat()
                 autreJoueur.msgSyncJ()
+                self.site.msgRoomStatOnePlayer(autreJoueur)
             
             
         
