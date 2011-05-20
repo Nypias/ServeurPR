@@ -17,7 +17,7 @@ class Joueur(WebSocketHandler):
     def __init__(self, transport):
         #= True si joueur banni
         self.ban = False
-        if transport.getPeer().host.find('134.214.') != -1:
+        if transport.getPeer().host.find('SOME IP HERE') != -1:
             self.ban = True
             transport.loseConnection()
         WebSocketHandler.__init__(self, transport)
