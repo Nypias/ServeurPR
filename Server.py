@@ -14,37 +14,51 @@ class StatsPage(Resource):
         self.factory = factory
     
     def render_GET(self, request):
-        page = """<style type='text/css'>
-            table {
-            border: medium solid #000000;
-            border-collapse : collapse;
-            width: 50%;
-            }
-            td, th {
-            border: thin solid #6495ed;
-            width: 50%;
-            }
-            th {
-            background-color : grey;
-            }
-        </style>
-        <body onload="setTimeout('window.location.reload()', 3000)">        
+        page = """<!DOCTYPE html>
+        <html>
+          <head>
+            <title>Pongroulette</title>
+            <meta charset="utf-8" />
+            <link href="pongroulette.css" rel="stylesheet" />
+          </head>
+          <body onload="setTimeout('window.location.reload()', 3000)">        
+            <div id="statsPage">
+              <h2>Statistiques</h2>
         """
-        page += "<p>Nombre de salles : " + str(len(self.factory.jeux)) + "</p>"
+        page += "<p class=\"contnbsalle\">Nombre de salles : <strong>" + str(len(self.factory.jeux)) + "</strong></p>"
         for jeu in self.factory.jeux:
-            page += "<table><tr><th>Pseudo</th><th>Score</th><th>IP</th></tr>\n"
+            page += "<table><tr><th class=\"colpseudo\">Pseudo</th><th class=\"colscore\">Score</th><th class=\"colip\">IP</th></tr>\n"
             for joueur in jeu.getJoueurs():
                 ip = str(joueur.transport.getPeer().host)
                 page += "<tr>\n    <td>" + joueur.name +\
                         "</td>\n    <td>" + str(joueur.score) +\
-                        "</td>\n    <td><a target=_blank href=\"http://www.dnswatch.info/dns/dnslookup?la=en&host=" + ip + "\">" + ip + "</a>" +\
+                        "</td>\n    <td><a target=\"_blank\" href=\"http://www.dnswatch.info/dns/dnslookup?la=en&host=" + ip + "\">" + ip + "</a>" +\
                         "</td>\n</tr>\n"
-            page += "</table>\n\n<br />"
+            page += "</table>\n\n"
+            
+        page += """
+            </div>
+          </body>
+        </html>"""
         return str(page)
 
 class GamePage(Resource):
     def render_GET(self, request):
-        return '<a href="index.html">Aller a l\'accueil du jeu</a>'
+        return """<!DOCTYPE html>
+        <html>
+          <head>
+            <title>Redirection en cours...</title>
+            <meta charset="utf-8" />
+            <link href="pongroulette.css" rel="stylesheet" />
+            <meta http-equiv="refresh" content="1; ./" />
+          </head>
+          <body>
+            <p style="text-align: center; margin-top: 200px;">
+              <a href="./" style="color: white;">Redirection vers l'accueil du jeu...</a>
+            </p>
+          </body>
+        </head>
+        """
 
     def render_POST(self, request):
         pageFile = open("../ClientPR/pongroulette.html")
