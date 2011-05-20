@@ -12,7 +12,7 @@ import Jeu
 class Trajectoire :
     
     TAILLE_RAQ = 20 #taille de la raquette entre 0 et 100 (en pourcentage)
-    TIME_INT = 0.015 #vitesse (sans unité particulière) de la balle
+    TIME_INT = 0.028 #vitesse (sans unité particulière) de la balle
     
 
     def __init__(self, jeu):
@@ -21,6 +21,7 @@ class Trajectoire :
         self.joueurs = self.jeu.joueurs
         self.delay = reactor.callLater(1 , self.genererTrajectoire,(50,50), 0) # on commencera à generer la trajectoire 
         # dans 0.5 secondes : cela permet de rendre la main au reactor et d'envoyer un message Gstat avant
+        self.vitesse = Trajectoire.TIME_INT
      
     def sendPoint(self, point,temps):
         
@@ -64,11 +65,14 @@ class Trajectoire :
               if self.joueurs[joueur.axe ^ 1] != None: # autre joueur de la partie
                   self.joueurs[joueur.axe ^ 1].gagner()
               joueur.perdre()
+              self.vitesse = Trajectoire.TIME_INT
               self.delay = reactor.callLater(0.7, self.genererTrajectoire, (50,50), 0)
               #self.genererTrajectoire((50,50),0) # generation nouvelle trajectoire à partir du point initial
         
     def genererTrajectoire(self, pointDepart, angle):
         temps = 0
+        if self.vitesse > 0.008: # augmentation de la vitesse
+            self.vitesse -= 0.001
         if pointDepart == (50,50):
             petitangle = random.random()*35
             dg = 180
@@ -93,7 +97,7 @@ class Trajectoire :
         self.ball[0] = round(self.ball[0] + u*math.cos(math.radians(angle)),2)
         self.ball[1] = round(self.ball[1] - u*math.sin(math.radians(angle)),2)
 
-        temps = u * Trajectoire.TIME_INT 
+        temps = u * self.vitesse
         
         pointCollision = (self.ball[0], self.ball[1])
         self.sendPoint(pointCollision,temps)
@@ -104,16 +108,4 @@ class Trajectoire :
         
     def stop(self):
             self.delay.cancel()
-                
-            
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+   
