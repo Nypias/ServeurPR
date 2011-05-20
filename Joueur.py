@@ -134,6 +134,16 @@ class Joueur(WebSocketHandler):
         for client in self.jeu.getJoueurs():
             msg["raquettes"][client.name] = client.raquette
         for client in self.jeu.getJoueurs():
+            client.send(msg)
+        
+        #print "SyncJ envoyé : " + json.dumps(msg)
+        
+    def msgSyncJBouge(self):
+        msg = {}
+        msg["msg"] = "SyncJ"
+        msg["raquettes"] = {}
+        msg["raquettes"][self.name] = self.raquette
+        for client in self.jeu.getJoueurs():
             if client != self:
                 client.send(msg)
         
@@ -160,7 +170,8 @@ class Joueur(WebSocketHandler):
             self.msgHello(msg)
         elif (msg["msg"] == "Bouge"):
             self.msgBouge(msg)
-            self.msgSyncJ()
+            if self.jeu.nbJoueurs() == 2:
+                self.msgSyncJBouge()
         else:
             print "Message inconnu !"
 
