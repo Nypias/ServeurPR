@@ -64,7 +64,7 @@ class Trajectoire :
               if self.joueurs[joueur.axe ^ 1] != None: # autre joueur de la partie
                   self.joueurs[joueur.axe ^ 1].gagner()
               joueur.perdre()
-              self.delay = reactor.callLater(0.6, self.genererTrajectoire, (50,50), 0)
+              self.delay = reactor.callLater(0.7, self.genererTrajectoire, (50,50), 0)
               #self.genererTrajectoire((50,50),0) # generation nouvelle trajectoire à partir du point initial
         
     def genererTrajectoire(self, pointDepart, angle):
