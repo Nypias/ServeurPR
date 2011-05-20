@@ -12,7 +12,7 @@ import Jeu
 class Trajectoire :
     
     TAILLE_RAQ = 20 #taille de la raquette entre 0 et 100 (en pourcentage)
-    TIME_INT = 0.025 #vitesse (sans unité particulière) de la balle
+    TIME_INT = 0.015 #vitesse (sans unité particulière) de la balle
     
 
     def __init__(self, jeu):
