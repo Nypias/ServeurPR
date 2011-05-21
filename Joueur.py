@@ -29,6 +29,7 @@ class Joueur(WebSocketHandler):
         self.offset = 0
         #position (du centre) de la raquette sur son axe, entre 0 et 100
         self.raquette = 50
+        self.oldRaquette = 50
         
         
     def __del__(self):
@@ -124,6 +125,7 @@ class Joueur(WebSocketHandler):
 
     def msgBouge(self, msg):
         #TODO déclencher erreur si n'est pas compris entre 0 et 100 : hack !
+        self.oldRaquette = self.raquette
         self.raquette = msg["raquette"]
         self.offset = self.calcOffset(msg["time"])
 
@@ -170,6 +172,7 @@ class Joueur(WebSocketHandler):
             self.msgHello(msg)
         elif (msg["msg"] == "Bouge"):
             self.msgBouge(msg)
+            self.lastBouge = time.time()
             if self.jeu.nbJoueurs() == 2:
                 self.msgSyncJBouge()
         else:

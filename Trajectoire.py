@@ -8,11 +8,12 @@ from twisted.internet import reactor, defer
 transformer la trajectoire en string JSON """
 
 import Jeu
+import time
 
 class Trajectoire :
     
     TAILLE_RAQ = 20 #taille de la raquette entre 0 et 100 (en pourcentage)
-    TIME_INT = 0.028 #vitesse (sans unité particulière) de la balle
+    TIME_INT = 0.020 #vitesse (sans unité particulière) de la balle
     
 
     def __init__(self, jeu):
@@ -22,6 +23,8 @@ class Trajectoire :
         self.delay = reactor.callLater(1 , self.genererTrajectoire,(50,50), 0) # on commencera à generer la trajectoire 
         # dans 0.5 secondes : cela permet de rendre la main au reactor et d'envoyer un message Gstat avant
         self.vitesse = Trajectoire.TIME_INT
+        
+        self.effet = 0
      
     def sendPoint(self, point,temps):
         
@@ -31,16 +34,22 @@ class Trajectoire :
                 client.transport.write(json.dumps(message))
 
     def choisirTrajectoire(self, pointDepart, angle):
-
+        
         axeJoueur = False
         rebondSurRaquette = False
         
         if self.ball[0] <= 1.5: # axe 0
+            self.vitesse = Trajectoire.TIME_INT
+            self.effet = 0
+            self.effet2 = 0
             if self.joueurs[0] != None:
                 joueur = self.joueurs[0]
                 axeJoueur = True
                 
         elif self.ball[0] >= 98.5: # axe 1
+            self.vitesse = Trajectoire.TIME_INT
+            self.effet = 0
+            self.effet2 = 0
             if self.joueurs[1] != None:
                 joueur = self.joueurs[1]
                 axeJoueur = True
@@ -48,6 +57,15 @@ class Trajectoire :
         if axeJoueur:
             if (joueur.raquette + Trajectoire.TAILLE_RAQ / 2) > self.ball[1] and (joueur.raquette - Trajectoire.TAILLE_RAQ / 2) < self.ball[1]:
                 rebondSurRaquette = True
+                if time.time() - joueur.lastBouge < 0.1:
+                    self.vitesse = 0.007
+                    if joueur.raquette > joueur.oldRaquette and angle > 0 and angle < 180 :
+                        self.effet = 2*angle
+                        self.effet2 = (angle+0.001)/2
+                    elif joueur.raquette < joueur.oldRaquette and angle > 180 and angle < 360:
+                        self.effet = 2*angle
+                        self.effet2 = (angle+0.001)/2
+                         
                 #print "rebondSurRaquette SUR RAQUETTE"
                 # TODO : envoyer un message Collision avec STATUS = "HIT" + Gstat
         
@@ -56,9 +74,11 @@ class Trajectoire :
             if (self.ball[0] == 1.5 or self.ball[0] == 98.5 ) and (self.ball[1] == 0 or self.ball[1]==100 ):
                 angle = 180 + angle
             elif self.ball[0] <= 1.5 or self.ball[0] >= 98.5: #si x = 0 ou 100 => collision sur un bord vertical (// axe y) => a' = 180 - a
-                angle = 180 - angle
-            elif (self.ball[1] <= 1 or self.ball[1] >= 99): #si y = 0 ou 100 => collision sur un bord horizontal (// axe x) => a' = - a
-                angle = 360 - angle
+                angle = 180 - angle + self.effet
+            elif (self.ball[1] <= 1) : #si y = 0 ou 100 => collision sur un bord horizontal (// axe x) => a' = - a
+                angle = 360 - angle + self.effet2
+            elif  self.ball[1] >= 99:
+                angle = 360 - angle - self.effet2
             self.genererTrajectoire(pointDepart, angle) # generation nouvelle trajectoire à partir du point courant
         else :
               #print "JOUEUR LOSE"
@@ -71,8 +91,8 @@ class Trajectoire :
         
     def genererTrajectoire(self, pointDepart, angle):
         temps = 0
-        if self.vitesse > 0.008: # augmentation de la vitesse
-            self.vitesse -= 0.001
+        #if self.vitesse > 0.008: # augmentation de la vitesse
+        #    self.vitesse -= 0.001
         if pointDepart == (50,50):
             petitangle = random.random()*35
             dg = 180
