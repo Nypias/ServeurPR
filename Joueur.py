@@ -31,6 +31,8 @@ class Joueur(WebSocketHandler):
         self.raquette = 50
         self.oldRaquette = 50
         
+        self.lastBouge = time.time()
+        
         
     def __del__(self):
         #print 'Deleting handler'

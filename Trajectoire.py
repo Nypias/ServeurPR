@@ -23,7 +23,6 @@ class Trajectoire :
         self.delay = reactor.callLater(1 , self.genererTrajectoire,(50,50), 0) # on commencera à generer la trajectoire 
         # dans 0.5 secondes : cela permet de rendre la main au reactor et d'envoyer un message Gstat avant
         self.vitesse = Trajectoire.TIME_INT
-        
         self.effet = 0
      
     def sendPoint(self, point,temps):
@@ -35,13 +34,13 @@ class Trajectoire :
 
     def choisirTrajectoire(self, pointDepart, angle):
         
+        angle = angle%360
         axeJoueur = False
         rebondSurRaquette = False
         
         if self.ball[0] <= 1.5: # axe 0
             self.vitesse = Trajectoire.TIME_INT
             self.effet = 0
-            self.effet2 = 0
             if self.joueurs[0] != None:
                 joueur = self.joueurs[0]
                 axeJoueur = True
@@ -49,7 +48,6 @@ class Trajectoire :
         elif self.ball[0] >= 98.5: # axe 1
             self.vitesse = Trajectoire.TIME_INT
             self.effet = 0
-            self.effet2 = 0
             if self.joueurs[1] != None:
                 joueur = self.joueurs[1]
                 axeJoueur = True
@@ -59,12 +57,11 @@ class Trajectoire :
                 rebondSurRaquette = True
                 if time.time() - joueur.lastBouge < 0.1:
                     self.vitesse = 0.007
-                    if joueur.raquette > joueur.oldRaquette and angle > 0 and angle < 180 :
+                    if joueur.raquette > joueur.oldRaquette and (angle%360) > 0 and (angle%360) < 180 :
                         self.effet = 2*angle
-                        self.effet2 = (angle+0.001)/2
-                    elif joueur.raquette < joueur.oldRaquette and angle > 180 and angle < 360:
+                    elif joueur.raquette < joueur.oldRaquette and (angle%360) > 180 and (angle%360) < 360:
                         self.effet = 2*angle
-                        self.effet2 = (angle+0.001)/2
+
                          
                 #print "rebondSurRaquette SUR RAQUETTE"
                 # TODO : envoyer un message Collision avec STATUS = "HIT" + Gstat
@@ -76,9 +73,9 @@ class Trajectoire :
             elif self.ball[0] <= 1.5 or self.ball[0] >= 98.5: #si x = 0 ou 100 => collision sur un bord vertical (// axe y) => a' = 180 - a
                 angle = 180 - angle + self.effet
             elif (self.ball[1] <= 1) : #si y = 0 ou 100 => collision sur un bord horizontal (// axe x) => a' = - a
-                angle = 360 - angle + self.effet2
+                angle = 360 - angle
             elif  self.ball[1] >= 99:
-                angle = 360 - angle - self.effet2
+                angle = 360 - angle
             self.genererTrajectoire(pointDepart, angle) # generation nouvelle trajectoire à partir du point courant
         else :
               #print "JOUEUR LOSE"
@@ -90,6 +87,7 @@ class Trajectoire :
               #self.genererTrajectoire((50,50),0) # generation nouvelle trajectoire à partir du point initial
         
     def genererTrajectoire(self, pointDepart, angle):
+        angle = angle%360
         temps = 0
         #if self.vitesse > 0.008: # augmentation de la vitesse
         #    self.vitesse -= 0.001
