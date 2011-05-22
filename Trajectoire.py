@@ -57,7 +57,7 @@ class Trajectoire :
             if (joueur.raquette + Trajectoire.TAILLE_RAQ / 2) > self.ball[1] and (joueur.raquette - Trajectoire.TAILLE_RAQ / 2) < self.ball[1]:
                 rebondSurRaquette = True
                 if time.time() - joueur.lastBouge < 0.1:
-                    self.vitesse = 0.007
+                    self.vitesse = 0.008
                     #random.seed()
                     if joueur.raquette > joueur.oldRaquette and (angle) > 0 and (angle) < 180 :
                         self.effetdown = 1
