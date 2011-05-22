@@ -58,7 +58,7 @@ class Trajectoire :
                 rebondSurRaquette = True
                 if time.time() - joueur.lastBouge < 0.1:
                     self.vitesse = 0.007
-                    random.seed()
+                    #random.seed()
                     if joueur.raquette > joueur.oldRaquette and (angle) > 0 and (angle) < 180 :
                         self.effetdown = 1
                     elif joueur.raquette < joueur.oldRaquette and (angle) > 180 and (angle) < 360:
@@ -105,7 +105,8 @@ class Trajectoire :
         self.effetdown = 0
         self.effetup = 0
         angle = angle%360
-        print angle
+         
+        #print angle
         temps = 0
         #if self.vitesse > 0.008: # augmentation de la vitesse
         #    self.vitesse -= 0.001
