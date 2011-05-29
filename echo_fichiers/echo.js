@@ -1,5 +1,4 @@
-  var secureCb;
-  var secureCbLabel;
+
   var wsUri;
   var consoleLog;
   var connectBut;
@@ -19,14 +18,7 @@
       document.getElementById("noWebSocketSupp").style.display = "block";
     }
 
-    secureCb = document.getElementById("secureCb");
-    secureCb.checked = false;
-    secureCb.onclick = toggleTls;
-
-    secureCbLabel = document.getElementById("secureCbLabel")
-
     wsUri = document.getElementById("wsUri");
-    toggleTls();
 
     connectBut = document.getElementById("connect");
     connectBut.onclick = doConnect;
@@ -58,17 +50,6 @@
 	document.getElementById("send3").onclick = doSend3;
   }
 
-  function toggleTls()
-  {
-    if (secureCb.checked)
-    {
-      //wsUri.value = "wss://echo.websocket.org";
-    }
-    else
-    {
-      //wsUri.value = "ws://echo.websocket.org";
-    }
-  }
 
   function doConnect()
   {
@@ -120,7 +101,7 @@
   {
     var pre = document.createElement("p");
     pre.style.wordWrap = "break-word";
-    pre.innerHTML = getSecureTag()+message;
+    pre.innerHTML = message;
     consoleLog.appendChild(pre);
 
     while (consoleLog.childNodes.length > 50)
@@ -145,7 +126,9 @@
 
   function onMessage(evt)
   {
-    logToConsole('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>');
+	d = new Date();
+	
+    logToConsole('<span style="color: blue;">RESPONSE: ' + d.getTime() + evt.data+'</span>');
   }
 
   function onError(evt)
@@ -164,13 +147,11 @@
     sendBut2.disabled = !isConnected;
 	sendMessage3.disabled = !isConnected;
     sendBut3.disabled = !isConnected;
-    secureCb.disabled = isConnected;
     var labelColor = "black";
     if (isConnected)
     {
       labelColor = "#999999";
     }
-     secureCbLabel.style.color = labelColor;
 
   }
 
@@ -182,16 +163,6 @@
 		}
 	}
 
-	function getSecureTag()
-	{
-		if (secureCb.checked)
-		{
-			return '<img src="img/tls-lock.png" width="6px" height="9px"> ';
-		}
-		else
-		{
-			return '';
-		}
-	}
+
 
   window.addEventListener("load", echoHandlePageLoad, false);

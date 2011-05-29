@@ -3,52 +3,39 @@ import random, math
 
 import json
 
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 """ Méthode de calcul de trajectoire, doit implémenter une méthode pour
 transformer la trajectoire en string JSON """
 
+
+import Jeu
+
 class Trajectoire :
     
-    NB_ROUND = 2
-    TAILLE_RAQ = 20
-    TIME_INT = 0.03    
-        
+    NB_ROUND = 2 # precision des valeurs
+    TAILLE_RAQ = 20 #taille de la raquette entre 0 et 100 (en pourcentage)
+    TIME_INT = 0.015 #vitesse (sans unité particulière) de la balle
+    
+
     def __init__(self, jeu):
 
         self.jeu = jeu
         self.joueurs = self.jeu.joueurs
-        
+       
         # for multiplayer mode
         self.Xfield = [50,90] # list of the ordinate starting with the field center and next the field corners
         self.Yfield = [50,50] # list of the abscissa ...
         self.Xball = [random.random()*100,50] 
         self.Yball = [random.random()*100,50]
-        
-        time = 0
-        angle = random.random()*360
-        self.ball = [50, 50]
-        self.ball[0] = self.ball[0] + math.cos(math.radians(angle))
-        self.ball[1] = self.ball[1] - math.sin(math.radians(angle)) # "-" car l'axe des Y est vers le bas
-        while(self.ball[0] > 0 and self.ball[0] < 100 and self.ball[1] > 0 and self.ball[1] < 100):
-            self.ball[0] = self.ball[0] + math.cos(math.radians(angle))
-            self.ball[1] = self.ball[1] - math.sin(math.radians(angle)) # "-" car l'axe des Y est vers le bas
-            #print self.ball[0], self.ball[1]
-            time += Trajectoire.TIME_INT
-        self.ball[0] = self.ball[0]
-        self.ball[1] = self.ball[1]
 
-        pointCollision = (self.ball[0], self.ball[1])
-		
-        print "COLLISION dans " + str(time) + " avec positionCollision = " + str(pointCollision)
-		
-        self.sendPoint(pointCollision,time)
-        reactor.callLater(time, self.choisirTrajectoire, pointCollision, angle)
-
-        
+        self.delay = reactor.callLater(1 , self.genererTrajectoire,(50,50), 0) # on commencera à generer la trajectoire 
+        # dans 0.5 secondes : cela permet de rendre la main au reactor et d'envoyer un message Gstat avant
+     
     def sendPoint(self, point,temps):
         
         for client in self.jeu.getJoueurs():
-                message = { "msg" : "Trajectoire", "point" : (point,client.getHourClient() + temps)}
+                message = { "msg" : "Trajectoire", "point" : (point, int(client.getHourClient() + temps*1000))}
+                json.encoder.FLOAT_REPR = lambda f: ("%.2f" % f)
                 client.transport.write(json.dumps(message))
 
     def choisirTrajectoire(self, pointDepart, angle):
@@ -56,12 +43,12 @@ class Trajectoire :
         axeJoueur = False
         rebondSurRaquette = False
         
-        if self.ball[0] <= 0: # axe 0
+        if self.ball[0] <= 1.5: # axe 0
             if self.joueurs[0] != None:
                 joueur = self.joueurs[0]
                 axeJoueur = True
                 
-        elif self.ball[0] >= 100: # axe 1
+        elif self.ball[0] >= 98.5: # axe 1
             if self.joueurs[1] != None:
                 joueur = self.joueurs[1]
                 axeJoueur = True
@@ -69,46 +56,63 @@ class Trajectoire :
         if axeJoueur:
             if (joueur.raquette + Trajectoire.TAILLE_RAQ / 2) > self.ball[1] and (joueur.raquette - Trajectoire.TAILLE_RAQ / 2) < self.ball[1]:
                 rebondSurRaquette = True
-                print "rebondSurRaquette SUR RAQUETTE"
+                #print "rebondSurRaquette SUR RAQUETTE"
                 # TODO : envoyer un message Collision avec STATUS = "HIT" + Gstat
         
         if (not axeJoueur) or (rebondSurRaquette) :
             
-            if self.ball[0] <= 0 or self.ball[0] >= 100: #si x = 0 ou 100 => collision sur un bord vertical (// axe y) => a' = 180 - a
+            if (self.ball[0] == 1.5 or self.ball[0] == 98.5 ) and (self.ball[1] == 0 or self.ball[1]==100 ):
+                angle = 180 + angle
+            elif self.ball[0] <= 1.5 or self.ball[0] >= 98.5: #si x = 0 ou 100 => collision sur un bord vertical (// axe y) => a' = 180 - a
                 angle = 180 - angle
-            elif (self.ball[1] <= 0 or self.ball[1] >= 100): #si y = 0 ou 100 => collision sur un bord horizontal (// axe x) => a' = - a
+            elif (self.ball[1] <= 1 or self.ball[1] >= 99): #si y = 0 ou 100 => collision sur un bord horizontal (// axe x) => a' = - a
                 angle = 360 - angle
             self.genererTrajectoire(pointDepart, angle) # generation nouvelle trajectoire à partir du point courant
         else :
-              print "JOUEUR LOSE"
-              joueur.score -= 1 # TODO : faire une méthode "joueur.perdre()" qui envoie un message Collision avec STATUS = MISS" + Gstat
-              self.genererTrajectoire((50,50),0) # generation nouvelle trajectoire à partir du point initial
+              #print "JOUEUR LOSE"
+              if self.joueurs[joueur.axe ^ 1] != None: # autre joueur de la partie
+                  self.joueurs[joueur.axe ^ 1].gagner()
+              joueur.perdre()
+              self.delay = reactor.callLater(0.7, self.genererTrajectoire, (50,50), 0)
+              #self.genererTrajectoire((50,50),0) # generation nouvelle trajectoire à partir du point initial
         
     def genererTrajectoire(self, pointDepart, angle):
-        time = 0
-        if self.jeu.nbJoueurs <= 2:
+        if self.jeu.nbJoueurs() <=2:
+            temps = 0
             if pointDepart == (50,50):
-                angle = random.random()*360
+                petitangle = random.random()*35
+                dg = 180
+                if random.random() > 0.5:
+                    dg = 0
+                hb = -1
+                if random.random() > 0.5:
+                    hb = 1
+                angle = dg + hb*(petitangle+10)
             self.ball = list(pointDepart)
             
-            self.ball[0] = self.ball[0] + math.cos(math.radians(angle))
-            self.ball[1] = self.ball[1] - math.sin(math.radians(angle)) # "-" car l'axe des Y est vers le bas
-            while(self.ball[0] > 0 and self.ball[0] < 100 and self.ball[1] > 0 and self.ball[1] < 100):
-                self.ball[0] = self.ball[0] + math.cos(math.radians(angle))
-                self.ball[1] = self.ball[1] - math.sin(math.radians(angle))
-                #print self.ball[0], self.ball[1]
-                time += Trajectoire.TIME_INT # "-" car l'axe des Y est vers le bas
-            self.ball[0] = self.ball[0]
-            self.ball[1] = self.ball[1]
+            
+            # determination of the shortest length to face a wall 
+            u = (1.5 - self.ball[0]) / math.cos(math.radians(angle))
+            if u<=0:
+                u = (98.5 - self.ball[0]) / math.cos(math.radians(angle))      
+            v = (self.ball[1] - 1) / math.sin(math.radians(angle))
+            if v<=0:
+                v = (self.ball[1] - 99) / math.sin(math.radians(angle))
+            u = min(u,v)
+            # result
+            self.ball[0] = round(self.ball[0] + u*math.cos(math.radians(angle)),2)
+            self.ball[1] = round(self.ball[1] - u*math.sin(math.radians(angle)),2)
+
+            temps = u * Trajectoire.TIME_INT 
             
             pointCollision = (self.ball[0], self.ball[1])
+            self.sendPoint(pointCollision,temps)
             
-            self.sendPoint(pointCollision,time)
-            
-            print "COLLISION dans " + str(time) + " avec positionCollision = " + str(pointCollision)
+            #print "COLLISION dans " + str(temps) + " avec positionCollision = (%.2f, %.2f)" % (pointCollision[0], pointCollision[1])
             #print self.joueurs.items()
-            reactor.callLater(time, self.choisirTrajectoire, pointCollision, angle)
-        
+            self.delay = reactor.callLater(temps, self.choisirTrajectoire, pointCollision, angle)
+              
+      
         else:
             # creation of the field
             print "Passage en mode multi-joueur!"
@@ -125,6 +129,10 @@ class Trajectoire :
             # throw the ball
             pointCollision = (self.Xball[1], self.Yball[1])
             self.multi_get_first_point()
+
+                    
+    def stop(self):
+            self.delay.cancel()
             
     def multi_collision(self, nb_player):
     # send back 1 if collision 0 if the player lose the game
