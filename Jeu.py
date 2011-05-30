@@ -5,27 +5,31 @@ from Trajectoire import Trajectoire
 
 import random
 
-""" Cette classe va gérer le jeu, càd conserver la liste des joueurs,
-gérer leurs points, et déclencher des calculs de trajectoire """
-
-
-                
+"""
+This Factory manages a list of rooms, a room is where 2 players are playing but there could be only 1 player (poor guy).
+If there is a solo player we pair it with the new one. If there isn't any solo player we create a new room.
+"""
 class JeuFactory(WebSocketSite):
-    
-    
     def __init__(self, resource):
         WebSocketSite.__init__(self, resource)
+        # list of the game rooms = 2 player playing together
         self.jeux = []
         
-    def msgRoomStat(self):
-            msg = {}
-            msg["msg"] = "RoomsStats"
-            msg["rooms"] = len(self.jeux)
-            for jeu in self.jeux:
-                for joueur in jeu.getJoueurs():
-                    joueur.send(msg)
+    def msgRoomStat(self): # TODO : rename ! doesn't correspond to Room_s_Stat_s_
+        """
+        Implements the sending of the message RoomsStat from protocol to all players
+        """
+        msg = {}
+        msg["msg"] = "RoomsStats"
+        msg["rooms"] = len(self.jeux)
+        for jeu in self.jeux:
+            for joueur in jeu.getJoueurs():
+                joueur.send(msg)
                     
-    def msgRoomStatOnePlayer(self,joueur):
+    def msgRoomStatOnePlayer(self,joueur): # TODO : rename ! doesn't correspond to Room_s_Stat_s_
+        """
+        Implements the sending of the message RoomsStat from protocol to one player
+        """
         msg = {}
         msg["msg"] = "RoomsStats"
         msg["rooms"] = len(self.jeux)
@@ -34,77 +38,103 @@ class JeuFactory(WebSocketSite):
         
     
     def ajouterJoueurDansJeu(self, joueur):
-        
-        for jeu in self.jeux[:]: # [:] pour créer une copie temporaire de jeux : cela permet la modification de jeux
-                                 # pendant l'itération
+        """
+        Adds a player into the first not full (1 player) game room
+        """
+        for jeu in self.jeux[:]: # [:] to create a temp copy of "jeux", it allows the modification of "jeux" during loop
+        #we loop over the existing rooms
             if jeu.nbJoueurs() < 2:
-                #numéro de l'axe sur lequel est la raquette du joueur (0 : raquette gauche, 1 : raquette droite)
-                #quand on est ici, ce nouveau joueur n'a pas encore été ajouté dans self.jeu.joueurs => +1
                 joueur.jeu = jeu
+                #id of the player's racket's axis (0 means left racket, 1 means right racket)
+                #when we are here, this new player hasn't been yet added in self.jeu.joueurs => +1
                 joueur.axe = jeu.joueurs.values().index(None)
                 jeu.ajouterJoueur(joueur)
                 
                 #joueur.msgGstat() # TODO : enlever ?
+                    
+                #this room has just been given a new player, so we move it at the end of the list, it's important
+                #if we want to pair the new player with the solo player who has been waiting for the longest time
                 self.jeux.remove(jeu)
                 self.jeux.append(jeu)
+
                 self.msgRoomStatOnePlayer(joueur)
                 break
-            
+                
         else:
+            #strange Pythonic construction, this "else" is paired with "for" and is called if the for hasn't been "breaked"
+            #it means that we haven't found any suitable room (solo player) so we create a new one !
             jeu = Jeu(self)
             joueur.jeu = jeu
-            joueur.axe = jeu.joueurs.values().index(None)
+            joueur.axe = jeu.joueurs.values().index(None) #TODO : this is a new game so the axis is obviously #1, right ?
             #jeu.ajouterJoueur(joueur)
             jeu.joueurs[0] = joueur
             jeu.trajectoire = Trajectoire(jeu)
             #joueur.msgGstat() # TODO : enlever ?
             self.jeux.append(jeu)
-            self.msgRoomStat()
+            self.msgRoomStat() #tell all the players that a new room is born
         
         
-
+"""
+This class manages a playing room which is constitued by 1 or 2 players. We have
+some convenient methods.
+"""
 class Jeu():
-     
     def __init__(self, site):
-        self.joueurs = { 0 : None , 1 : None}
-        self.site = site
-        self.jeux = site.jeux
+        self.joueurs = { 0 : None , 1 : None} #0 is left axis and 1 is right axis
+        self.site = site #site is the websocket's lib entity used to talk with the player
+        self.jeux = site.jeux #all the rooms
         #self.trajectoire = Trajectoire(self)
         
     def ajouterJoueur(self,joueur):
+        """
+        Adds a player in this room
+        """
+        #we look for the first free racket to give to the player, if there was 3 players and the second one left
+        #the new player will play in second position
+        #TODO : it would be better to search for the None value and insert there instead of for-break !!! check : no
+        #regression !
         for numAxe in self.joueurs.keys():
             if self.joueurs[numAxe] == None:
-                
+                #free racket found
                 self.joueurs[numAxe] = joueur
                 newPseudo = False
+                #TODO : my eyes are burning out of tears ! it would be better to search this pseudo in the list and
+                #count the occurences !
+                #if the new player uses a name which is already in use, we add some random digits at the end and tell
+                #him !
                 while joueur.name == self.joueurs[numAxe ^ 1].name:
                     newPseudo = True
                     joueur.name += str(random.randint(1, 9))
                 if joueur.name != "" and newPseudo:
                     joueur.msgNewPseudo(joueur.name)
+
+                #restart the trajectory (we must because the number of players has changed so have the rules)
                 self.trajectoire.stop()
                 del self.trajectoire
                 self.trajectoire = Trajectoire(self)
                 break
             
-    def enleverJoueur(self,joueur):
-        
-        self.joueurs[joueur.axe] = None
-        joueur.msgGstat()
-        if self.nbJoueurs() == 0:
+    def enleverJoueur(self, joueur):
+        """
+        Delete a player from the room.
+        """
+        self.joueurs[joueur.axe] = None #TODO : wouldn't be better to remove from the list instead of replacing by None?
+        joueur.msgGstat() #tells the players that there is one player less
+        if self.nbJoueurs() == 0: #empty room => deleted room
             self.trajectoire.stop()
             del self.trajectoire
             self.jeux.remove(self)
-            self.site.msgRoomStat()
+            self.site.msgRoomStat() #tells the player that there is one room less
         elif self.nbJoueurs() == 1:
-            # On va essayer de mettre le joueur resté seul dans une partie où un autre joueur est seul
+            #we try to pair the player left alone with an other solo player 
             for jeu in self.jeux[:]:
                 if jeu.nbJoueurs() == 1 and jeu != self:
-                    joueurABouger = self.joueurs[joueur.axe ^ 1] #joueur.axe ^ 1 donne l'autre joueur de la partie
+                    #TODO : Alex could you explain these lines please ? not very clear for me...
+                    joueurABouger = self.joueurs[joueur.axe ^ 1] #joueur.axe ^ 1 gives the other player of the room
                     self.trajectoire.stop()
                     del self.trajectoire
                     self.jeux.remove(self)
-                    #joueurABouger.reset() A mettre si on veut que le joueur qui arrive dans une nouvelle partie ait un score de 0
+                    #joueurABouger.reset() #use it if we want that the coming player beginns with score = 0 
                     joueurABouger.jeu = jeu
                     joueurABouger.axe = jeu.joueurs.values().index(None)
                     jeu.ajouterJoueur(joueurABouger)
@@ -130,19 +160,14 @@ class Jeu():
             
         
     def getJoueurs(self):
-        joueurs = []
-        for joueur in self.joueurs.values():
-            if joueur != None:
-                joueurs.append(joueur)
-        return joueurs
+        """
+        Returns all players, without the empty slots (where player left).
+        """
+        return filter(lambda x : x!=None, self.joueurs.values())
     
     def nbJoueurs(self):
-        nb = 0
-        for joueur in self.joueurs.values():
-            if joueur != None:
-                nb += 1
-        return nb
+        """
+        How many players do we have ?
+        """
+        return len(self.getJoueurs())
         
-        
-	
-            
