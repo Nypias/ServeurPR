@@ -12,7 +12,7 @@ import Jeu
 
 class Trajectoire :
     
-    NB_ROUND = 2 # precision des valeurs
+    #NB_ROUND = 2 # precision des valeurs
     TAILLE_RAQ = 20 #taille de la raquette entre 0 et 100 (en pourcentage)
     TIME_INT = 0.015 #vitesse (sans unité particulière) de la balle
     
@@ -78,7 +78,7 @@ class Trajectoire :
         
     def genererTrajectoire(self, pointDepart, angle):
         if self.jeu.nbJoueurs() <=2:
-            temps = 0
+            Stemps = 0
             if pointDepart == (50,50):
                 petitangle = random.random()*35
                 dg = 180
@@ -89,8 +89,7 @@ class Trajectoire :
                     hb = 1
                 angle = dg + hb*(petitangle+10)
             self.ball = list(pointDepart)
-            
-            
+                        
             # determination of the shortest length to face a wall 
             u = (1.5 - self.ball[0]) / math.cos(math.radians(angle))
             if u<=0:
@@ -111,16 +110,15 @@ class Trajectoire :
             #print "COLLISION dans " + str(temps) + " avec positionCollision = (%.2f, %.2f)" % (pointCollision[0], pointCollision[1])
             #print self.joueurs.items()
             self.delay = reactor.callLater(temps, self.choisirTrajectoire, pointCollision, angle)
-              
-      
+                    
         else:
             # creation of the field
             print "Passage en mode multi-joueur!"
-            angle = 2*math.pi/self.jeu.nbJoueurs
-            print self.jeu.nbJoueurs
+            angle = 2*math.pi/self.jeu.nbJoueurs()
+            print self.jeu.nbJoueurs()
             print "ancre n°1 : " + str(self.Xfield[1]) + " " + str(self.Yfield[1])
             i = 1
-            while i<self.jeu.nbJoueurs:
+            while i<self.jeu.nbJoueurs():
                 self.Xfield.append(50 + 40*math.cos(angle*i)) # trunc isn't needed, python is so high
                 self.Yfield.append(50 - 40*math.sin(angle*i)) # because the field is build counterclockwise
                 print "ancre n°" + str(i+1) + " : " + str(self.Xfield[i+1]) + " " + str(self.Yfield[i+1])
@@ -129,7 +127,6 @@ class Trajectoire :
             # throw the ball
             pointCollision = (self.Xball[1], self.Yball[1])
             self.multi_get_first_point()
-
                     
     def stop(self):
             self.delay.cancel()
@@ -155,19 +152,23 @@ class Trajectoire :
         A = self.Xball[1]-self.Xball[0]
         B = self.Yball[1]-self.Yball[0]
         longeur = (math.fabs(A)+math.fabs(B))
-        a_before = round(A/longeur, NB_ROUND)
-        b_before = round(B/longeur, NB_ROUND)
+        a_before = round(A/longeur, 2)
+        b_before = round(B/longeur, 2)
+        #a_before = round(A/longeur, NB_ROUND)
+        #b_before = round(B/longeur, NB_ROUND)
         print " a_before : " + str(a_before) + " b_before : " + str(b_before)
             
         # création of the collided line
         senderPlusUn = nb_sender+1
-        if nb_sender == self.jeu.nbJoueurs:
+        if nb_sender == self.jeu.nbJoueurs():
             senderPlusUn = 1
         A = self.Xfield[nb_sender] - self.Xfield[senderPlusUn]
         B = self.Yfield[nb_sender] - self.Yfield[senderPlusUn]
         longeur = (math.fabs(A)+math.fabs(B))
-        a_border = round(A/longeur, NB_ROUND)
-        b_border = round(B/longeur, NB_ROUND)
+        a_border = round(A/longeur, 2)
+        b_border = round(B/longeur, 2)
+        #a_border = round(A/longeur, NB_ROUND)
+        #b_border = round(B/longeur, NB_ROUND)
         print " a_border : " + str(a_border) + " b_border : " + str(b_border)
         
         # création of the new trajectory
@@ -183,22 +184,26 @@ class Trajectoire :
 
         #for each player we look for intersect between this new trajectory and a player segment
         i = 1
-        while i < self.jeu.nbJoueurs+1:
+        while i < self.jeu.nbJoueurs()+1:
             if i == nb_sender:
                 i=i+1
             nb_player = i
             playerPlusUn = i+1
-            if i == self.jeu.nbJoueurs:
+            if i == self.jeu.nbJoueurs():
                 playerPlusUn = 1
             # création of the line supporting the player segment
             A = self.Xfield[nb_player]-self.Xfield[playerPlusUn]
             B = self.Yfield[nb_player]-self.Yfield[playerPlusUn]
             longeur = (math.fabs(A)+math.fabs(B))
-            a_intersect_line = round(A/longeur, NB_ROUND)
-            b_intersect_line = round(B/longeur, NB_ROUND)
+            a_intersect_line = round(A/longeur, 2)
+            b_intersect_line = round(B/longeur, 2)
+            #a_intersect_line = round(A/longeur, NB_ROUND)
+            #b_intersect_line = round(B/longeur, NB_ROUND)
             # determination of the intersection point
-            Xintersect = round((self.Yfield[nb_player] - self.Yball[len(self.Yball)-1] - (self.Xfield[nb_player]*b_intersect_line/a_intersect_line) + (self.Xball[len(self.Xball)-1]*b_after/a_after) ) / ( b_after/a_after - b_intersect_line/a_intersect_line), NB_ROUND)
-            Yintersect = round(self.Yfield[nb_player] + (Xintersect-self.Xfield[nb_player])*b_intersect_line/a_intersect_line, NB_ROUND)
+            Xintersect = round((self.Yfield[nb_player] - self.Yball[len(self.Yball)-1] - (self.Xfield[nb_player]*b_intersect_line/a_intersect_line) + (self.Xball[len(self.Xball)-1]*b_after/a_after) ) / ( b_after/a_after - b_intersect_line/a_intersect_line), 2)
+            Yintersect = round(self.Yfield[nb_player] + (Xintersect-self.Xfield[nb_player])*b_intersect_line/a_intersect_line, 2)
+            #Xintersect = round((self.Yfield[nb_player] - self.Yball[len(self.Yball)-1] - (self.Xfield[nb_player]*b_intersect_line/a_intersect_line) + (self.Xball[len(self.Xball)-1]*b_after/a_after) ) / ( b_after/a_after - b_intersect_line/a_intersect_line), NB_ROUND)
+            #Yintersect = round(self.Yfield[nb_player] + (Xintersect-self.Xfield[nb_player])*b_intersect_line/a_intersect_line, NB_ROUND)
             # is this intersection point in the player segment ?
             if ( (self.Xfield[nb_player]<=Xintersect and Xintersect<=self.Xfield[playerPlusUn]) or (self.Xfield[playerPlusUn]<=Xintersect and Xintersect<=self.Xfield[nb_player]) ) and ( (self.Yfield[nb_player]<=Yintersect and Yintersect<=self.Yfield[playerPlusUn]) or (self.Yfield[playerPlusUn]<=Yintersect and Yintersect<=self.Yfield[nb_player]) ):
                 # if yes then set the news X,Yball
@@ -207,7 +212,7 @@ class Trajectoire :
                 self.Yball[0] = self.Yball[1]
                 self.Yball[1] = Yintersect
                 self.multi_time_calculation(nb_player)
-                i = self.jeu.nbJoueurs # to end the loop
+                i = self.jeu.nbJoueurs() # to end the loop
             i=i+1
         print "multi_get_new_point FIN"    
                 
@@ -219,8 +224,10 @@ class Trajectoire :
         A = self.Xball[1]-self.Xball[0]
         B = self.Yball[1]-self.Yball[0]
         longeur = (math.fabs(A)+math.fabs(B))
-        a_before = round(A/longeur, NB_ROUND)
-        b_before = round(B/longeur, NB_ROUND)
+        a_before = round(A/longeur, 2)
+        b_before = round(B/longeur, 2)
+        #a_before = round(A/longeur, NB_ROUND)
+        #b_before = round(B/longeur, NB_ROUND)
             
         # création of the collided line
         a_border = 0.5
@@ -233,26 +240,32 @@ class Trajectoire :
         a_perpendicular = - a_border
         b_perpendicular = b_border
         scalar_product_perpendicular = a_before*a_perpendicular + b_before*b_perpendicular
-        a_after = round(a_border*scalar_product_border - a_perpendicular*scalar_product_perpendicular, NB_ROUND)
-        b_after = round(b_border*scalar_product_border - b_perpendicular*scalar_product_perpendicular, NB_ROUND)
-
+        a_after = round(a_border*scalar_product_border - a_perpendicular*scalar_product_perpendicular, 2)
+        b_after = round(b_border*scalar_product_border - b_perpendicular*scalar_product_perpendicular, 2)
+        #a_after = round(a_border*scalar_product_border - a_perpendicular*scalar_product_perpendicular, NB_ROUND)
+        #b_after = round(b_border*scalar_product_border - b_perpendicular*scalar_product_perpendicular, NB_ROUND)
+        
         #for each player we look for intersect between this new trajectory and a player segment
         i = 1
-        while i < self.jeu.nbJoueurs+1:
+        while i < self.jeu.nbJoueurs()+1:
             print "joueur " + str(i) + " test"
             nb_player = i
             playerPlusUn = i+1
-            if i == self.jeu.nbJoueurs:
+            if i == self.jeu.nbJoueurs():
                 playerPlusUn = 1
             # création of the line supporting the player segment
             A = self.Xfield[i]-self.Xfield[playerPlusUn]
             B = self.Yfield[i]-self.Yfield[playerPlusUn]
             longeur = (math.fabs(A)+math.fabs(B))
-            a_intersect_line = round(A/longeur, NB_ROUND)
-            b_intersect_line = round(B/longeur, NB_ROUND)
+            a_intersect_line = round(A/longeur, 2)
+            b_intersect_line = round(B/longeur, 2)
+            #a_intersect_line = round(A/longeur, NB_ROUND)
+            #b_intersect_line = round(B/longeur, NB_ROUND)
             # determination of the intersection point
-            Xintersect = round((self.Yfield[nb_player] - self.Yball[len(self.Yball)-1] - (self.Xfield[nb_player]*b_intersect_line/a_intersect_line) + (self.Xball[len(self.Xball)-1]*b_after/a_after) ) / ( b_after/a_after - b_intersect_line/a_intersect_line), NB_ROUND)
-            Yintersect = round(self.Yfield[nb_player] + (Xintersect-self.Xfield[nb_player])*b_intersect_line/a_intersect_line, NB_ROUND)
+            Xintersect = round((self.Yfield[nb_player] - self.Yball[len(self.Yball)-1] - (self.Xfield[nb_player]*b_intersect_line/a_intersect_line) + (self.Xball[len(self.Xball)-1]*b_after/a_after) ) / ( b_after/a_after - b_intersect_line/a_intersect_line), 2)
+            Yintersect = round(self.Yfield[nb_player] + (Xintersect-self.Xfield[nb_player])*b_intersect_line/a_intersect_line, 2)
+            #Xintersect = round((self.Yfield[nb_player] - self.Yball[len(self.Yball)-1] - (self.Xfield[nb_player]*b_intersect_line/a_intersect_line) + (self.Xball[len(self.Xball)-1]*b_after/a_after) ) / ( b_after/a_after - b_intersect_line/a_intersect_line), NB_ROUND)
+            #Yintersect = round(self.Yfield[nb_player] + (Xintersect-self.Xfield[nb_player])*b_intersect_line/a_intersect_line, NB_ROUND)
             print "Xintersect : " + str(Xintersect) 
             print "Yintersect : " + str(Yintersect) 
             # is this intersection point in the player segment ?
@@ -263,7 +276,7 @@ class Trajectoire :
                 self.Yball[0] = self.Yball[1]
                 self.Yball[1] = Yintersect
                 print "fin premier point -> joueur " + str(i) + "  va prendre cher"
-                i = self.jeu.nbJoueurs # to end the loop
+                i = self.jeu.nbJoueurs() # to end the loop
                 self.multi_time_calculation(nb_player)
             i = i+1
         print "multi_get_first_point FIN"         

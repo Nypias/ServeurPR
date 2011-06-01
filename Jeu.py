@@ -43,7 +43,7 @@ class JeuFactory(WebSocketSite):
         """
         for jeu in self.jeux[:]: # [:] to create a temp copy of "jeux", it allows the modification of "jeux" during loop
         #we loop over the existing rooms
-            if jeu.nbJoueurs() < 2:
+            if jeu.nbJoueurs() < 3:
                 joueur.jeu = jeu
                 #id of the player's racket's axis (0 means left racket, 1 means right racket)
                 #when we are here, this new player hasn't been yet added in self.jeu.joueurs => +1
@@ -80,7 +80,7 @@ some convenient methods.
 """
 class Jeu():
     def __init__(self, site):
-        self.joueurs = { 0 : None , 1 : None} #0 is left axis and 1 is right axis
+        self.joueurs = { 0 : None , 1 : None , 2 : None} #0 is left axis and 1 is right axis
         self.site = site #site is the websocket's lib entity used to talk with the player
         self.jeux = site.jeux #all the rooms
         #self.trajectoire = Trajectoire(self)
@@ -102,9 +102,16 @@ class Jeu():
                 #count the occurences !
                 #if the new player uses a name which is already in use, we add some random digits at the end and tell
                 #him !
-                while joueur.name == self.joueurs[numAxe ^ 1].name:
+                unique = False
+                if not joueur.name in self.joueurs:
+                    unique = True
+                while unique == False:
                     newPseudo = True
+                    print "ici"
                     joueur.name += str(random.randint(1, 9))
+                    if not joueur.name in self.joueurs:
+                        print "coucou"
+                        unique = True
                 if joueur.name != "" and newPseudo:
                     joueur.msgNewPseudo(joueur.name)
 
