@@ -80,7 +80,7 @@ some convenient methods.
 """
 class Jeu():
     def __init__(self, site):
-        self.joueurs = { 0 : None , 1 : None , 2 : None} #0 is left axis and 1 is right axis
+        self.joueurs = { 0 : None , 1 : None , 2 : None} 
         self.site = site #site is the websocket's lib entity used to talk with the player
         self.jeux = site.jeux #all the rooms
         #self.trajectoire = Trajectoire(self)
@@ -107,10 +107,8 @@ class Jeu():
                     unique = True
                 while unique == False:
                     newPseudo = True
-                    print "ici"
                     joueur.name += str(random.randint(1, 9))
                     if not joueur.name in self.joueurs:
-                        print "coucou"
                         unique = True
                 if joueur.name != "" and newPseudo:
                     joueur.msgNewPseudo(joueur.name)
