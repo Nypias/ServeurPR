@@ -135,7 +135,7 @@ class Joueur(WebSocketHandler):
                 self.name = msg["pseudo"]
         if self.jeu.nbJoueurs() == 2:
             #if there is 2 players, one adds digits to the pseudo until it is different from the other
-            while (self.name == self.jeu.joueurs[self.axe^1].name):
+            if (self.name == self.jeu.joueurs[self.axe^1].name):
                 newPseudo = True
                 self.name += str(random.randint(1, 9))
         if newPseudo:
