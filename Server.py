@@ -34,8 +34,7 @@ class StatsPage(Resource):
                         "</td>\n    <td>" + str(joueur.score) +\
                         "</td>\n    <td><a target=\"_blank\" href=\"http://www.dnswatch.info/dns/dnslookup?la=en&host=" + ip + "\">" + ip + "</a>" +\
                         "</td>\n</tr>\n"
-            page += "</table>\n\n"
-            
+            page += "</table>\n\n"            
         page += """
             </div>
           </body>
@@ -83,6 +82,7 @@ if __name__ == "__main__":
 
     print "launching reactor"
 
+    webbrowser.open("http://localhost:8080/pongroulette.html")
     webbrowser.open("http://localhost:8080/pongroulette.html")
     webbrowser.open("http://localhost:8080/pongroulette.html")
 
