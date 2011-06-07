@@ -217,7 +217,22 @@ class Joueur(WebSocketHandler):
             print "Message inconnu !"
 
         self.setAlive()
-            
+        
+    def msgTerrain(self):
+        """
+        Informs the client about the field borders
+        """
+        msg = {}
+        msg["msg"] = "Terrain"
+        msg["nbAxes"] = self.jeu.nbJoueurs()
+        msg["ancres"] = {}
+        i = 1
+        while i <= self.jeu.nbJoueurs()
+            msg["ancre"+str(i)] = {}
+            msg["x"] = self.jeu.trajectoire.Xfield[i]
+            msg["y"] = self.jeu.trajectoire.Yfield[i]
+            i=i+1
+        self.send(msg)            
 
     def frameReceived(self, frame):
         #Called by the websocket library when a new frame is received.
