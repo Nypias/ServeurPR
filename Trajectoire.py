@@ -170,7 +170,7 @@ class Trajectoire :
             
         # création of the collided line
         senderPlusUn = nb_sender+1
-        if nb_sender == self.jeu.nbJoueurs():
+        if nb_sender == self.nbJoueurs:
             senderPlusUn = 1
         A = self.Xfield[nb_sender] - self.Xfield[senderPlusUn]
         B = self.Yfield[nb_sender] - self.Yfield[senderPlusUn]
@@ -193,11 +193,11 @@ class Trajectoire :
 
         #for each player we look for intersect between this new trajectory and a player segment
         i = 1
-        while i < self.jeu.nbJoueurs()+1:
+        while i < self.nbJoueurs+1:
             if i != nb_sender:               
                 nb_player = i
                 playerPlusUn = i+1
-                if i == self.jeu.nbJoueurs():
+                if i == self.nbJoueurs:
                     playerPlusUn = 1
                 # création of the line supporting the player segment
                 A = self.Xfield[nb_player]-self.Xfield[playerPlusUn]
@@ -236,7 +236,7 @@ class Trajectoire :
                     self.Yball[0] = self.Yball[1]
                     self.Yball[1] = Yintersect
                     self.multi_time_calculation(nb_player)
-                    i = self.jeu.nbJoueurs() # to end the loop
+                    i = self.nbJoueurs # to end the loop
             i=i+1
         #print "multi_get_new_point FIN"    
                 
@@ -267,11 +267,11 @@ class Trajectoire :
        
         #for each player we look for intersect between this new trajectory and a player segment
         i = 1
-        while i < self.jeu.nbJoueurs()+1:
+        while i < self.nbJoueurs+1:
             print "joueur " + str(i) + " test"
             nb_player = i
             playerPlusUn = i+1
-            if i == self.jeu.nbJoueurs():
+            if i == self.nbJoueurs:
                 playerPlusUn = 1
             # création of the line supporting the player segment
             A = self.Xfield[nb_player]-self.Xfield[playerPlusUn]
@@ -310,7 +310,7 @@ class Trajectoire :
                 self.Yball[0] = self.Yball[1]
                 self.Yball[1] = Yintersect
                 print "fin premier point -> joueur " + str(i) + "  va prendre cher"
-                i = self.jeu.nbJoueurs() # to end the loop              
+                i = self.nbJoueurs # to end the loop              
                 self.multi_time_calculation(nb_player)
             i = i+1
         #print "multi_get_first_point FIN"         

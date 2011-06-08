@@ -94,6 +94,7 @@ class Joueur(WebSocketHandler):
             self.score -= 1
         self.msgCollision(False) #tell the player he failed
         self.msgGstat() #tells everyone the new score
+        self.msgTerrain() # PROBLEM
         
     def gagner(self):
         """
@@ -224,10 +225,9 @@ class Joueur(WebSocketHandler):
         """
         msg = {}
         msg["msg"] = "Terrain"
-        msg["nbAxes"] = self.jeu.nbJoueurs()
         msg["ancres"] = {}
         i = 1
-        while i <= self.jeu.nbJoueurs()
+        while i <= self.jeu.nbJoueurs():
             msg["ancre"+str(i)] = {}
             msg["x"] = self.jeu.trajectoire.Xfield[i]
             msg["y"] = self.jeu.trajectoire.Yfield[i]

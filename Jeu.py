@@ -98,8 +98,6 @@ class Jeu():
                 #free racket found
                 self.joueurs[numAxe] = joueur
                 newPseudo = False
-                #TODO : my eyes are burning out of tears ! it would be better to search this pseudo in the list and
-                #count the occurences !
                 #if the new player uses a name which is already in use, we add some random digits at the end and tell
                 #him !
                 unique = False
@@ -130,6 +128,9 @@ class Jeu():
             del self.trajectoire
             self.jeux.remove(self)
             self.site.msgRoomStat() #tells the player that there is one room less
+            
+#ICI j'ai vraiment la flème de m'en occuper.
+             
         elif self.nbJoueurs() == 1:
             #we try to pair the player left alone with an other solo player 
             for jeu in self.jeux[:]:
@@ -174,5 +175,5 @@ class Jeu():
         """
         How many players do we have ?
         """
-        return len(self.getJoueurs())
+        return len(self.getJoueurs()) # beurk .. ?
         
