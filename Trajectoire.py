@@ -55,7 +55,9 @@ class Trajectoire :
                 rebondSurRaquette = True
                 if time.time() - joueur.lastBouge < 0.1:
                     self.vitesse = 0.007
-                    if (joueur.raquette > joueur.oldRaquette and (angle) > 0 and (angle) < 180) or (joueur.raquette < joueur.oldRaquette and (angle) > 180 and (angle) < 360) :
+                    if joueur.raquette > joueur.oldRaquette and (angle) > 0 and (angle) < 180:
+                        self.effet = 2*angle
+                    elif joueur.raquette < joueur.oldRaquette and (angle) > 180 and (angle) < 360:
                         self.effet = 2*angle
 
                          
