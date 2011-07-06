@@ -98,11 +98,9 @@ class Jeu():
                 #free racket found
                 self.joueurs[numAxe] = joueur
                 newPseudo = False
-                #TODO : my eyes are burning out of tears ! it would be better to search this pseudo in the list and
-                #count the occurences !
                 #if the new player uses a name which is already in use, we add some random digits at the end and tell
                 #him !
-                while joueur.name == self.joueurs[numAxe ^ 1].name:
+                if joueur.name == self.joueurs[numAxe ^ 1].name:
                     newPseudo = True
                     joueur.name += str(random.randint(1, 9))
                 if joueur.name != "" and newPseudo:
@@ -118,7 +116,7 @@ class Jeu():
         """
         Delete a player from the room.
         """
-        self.joueurs[joueur.axe] = None #TODO : wouldn't be better to remove from the list instead of replacing by None?
+        self.joueurs[joueur.axe] = None
         joueur.msgGstat() #tells the players that there is one player less
         if self.nbJoueurs() == 0: #empty room => deleted room
             self.trajectoire.stop()
@@ -129,7 +127,7 @@ class Jeu():
             #we try to pair the player left alone with an other solo player 
             for jeu in self.jeux[:]:
                 if jeu.nbJoueurs() == 1 and jeu != self:
-                    #TODO : Alex could you explain these lines please ? not very clear for me...
+                    #we have found a game "jeu" with 1 player ("jeu!=self" allows not to choose the previous game of the player)
                     joueurABouger = self.joueurs[joueur.axe ^ 1] #joueur.axe ^ 1 gives the other player of the room
                     self.trajectoire.stop()
                     del self.trajectoire
