@@ -23,11 +23,11 @@ class Trajectoire :
         self.joueurs = self.jeu.joueurs
         self.nbJoueurs = 0
        
-        # for multiplayer mode
+        # for multiplayer mode 
         self.Xfield = [50,90] # list of the ordinate starting with the field center and next the field corners
         self.Yfield = [50,50] # list of the abscissa ...
-        self.Xball = [random.random()*100,50] 
-        self.Yball = [random.random()*100,50]
+        self.Xball = [random.random()*100,50] # the two ball coordinates, [0] => the past and [1] => the present
+        self.Yball = [random.random()*100,50] # these preset figures are chosen to start a game with a ball throw from the field center
 
         self.delay = reactor.callLater(1 , self.genererTrajectoire,(50,50), 0) # on commencera à generer la trajectoire 
         # dans 0.5 secondes : cela permet de rendre la main au reactor et d'envoyer un message Gstat avant
@@ -40,7 +40,8 @@ class Trajectoire :
                 client.transport.write(json.dumps(message))
 
     def choisirTrajectoire(self, pointDepart, angle):
-
+        
+        # MODE with two or less player
         axeJoueur = False
         rebondSurRaquette = False
         
@@ -78,8 +79,10 @@ class Trajectoire :
               #self.genererTrajectoire((50,50),0) # generation nouvelle trajectoire à partir du point initial
         
     def genererTrajectoire(self, pointDepart, angle):
+        
+        # Call by the two MODE, the "if else" identify the case. 
         print "genererTraj"
-        if self.jeu.nbJoueurs() <=2:
+        if self.jeu.nbJoueurs() <=2: 
             Stemps = 0
             if pointDepart == (50,50):
                 petitangle = random.random()*35
@@ -115,7 +118,7 @@ class Trajectoire :
                     
         else:
             if self.nbJoueurs != self.jeu.nbJoueurs():
-                # creation of the new field
+                # creation of the new field because the number of player has change
                 self.Xfield = [50,90] 
                 self.Yfield = [50,50] 
                 print "Passage en mode multi-joueur!"
@@ -130,9 +133,9 @@ class Trajectoire :
                     i = i + 1
                 self.nbJoueurs = self.jeu.nbJoueurs()
                 print "Terrain multi-joueur cree"
-            else:
-                self.Xball = [random.random()*100,50] 
-                self.Yball = [random.random()*100,50]
+            # set of the random ball start
+            self.Xball = [random.random()*100,50] 
+            self.Yball = [random.random()*100,50]
             # throw the ball
             self.multi_get_first_point()
                     
@@ -140,15 +143,15 @@ class Trajectoire :
         self.delay.cancel()
             
     def multi_collision(self, nb_player):
-    # send back 1 if collision 0 if the player lose the game
         # we test if the player is close enought(depending on the raquette size) to the ball impact
         i = 0
         # determination of abscissa and odonate of the raquette center
         Xraquette = self.Xfield[nb_player]*self.joueurs[nb_player].raquette/100 + self.Xfield[nb_player+1]*(1-self.joueurs[nb_player].raquette/100)
-        Yraquette = self.Yfield[nb_player]*self.joueurs[nb_player].raquette/100 + self.Yfield[nb_player+1]*(1-self.joueurs[nb_player].raquette/100)
-        # i did the arbitrary choise of a 64% lenght raquette regarding the size of the player segment that's why: 32^2 is used
+        Yraquette = self.Yfield[nb_player]*self.joueurs[nb_player].raquette/100 + self.Yfield[nb_player+1]*(1-self.joueurs[nb_player].raquette/100)     
         distance_from_raquette_center = (self.Xball[len(self.Xball)-1]-Xraquette)*(self.Xball[len(self.Xball)-1]-Xraquette)+(self.Yball[len(self.Yball)-1]-Yraquette)*(self.Yball[len(self.Yball)-1]-Yraquette)
         #print str(math.sqrt(distance_from_raquette_center))
+        # i did the arbitrary choise of a 60% lenght raquette regarding the size of the player segment that's why: 30*30 is used (cf: pythagore)
+# TO CHANGE: this value of 60% is crazy, we'll choose something like 20% but for testing i let it high. This is the only line where the parameter appear.  
         if ( distance_from_raquette_center ) < 30*30:
             self.multi_get_new_point(nb_player)
             print "COLLISION"
@@ -159,16 +162,17 @@ class Trajectoire :
             
 
     def multi_get_new_point(self, nb_sender):
-	 
-        # création of the vector before collision
+	# draw it step by step, i 
+    
+        # création of the vector before collision (unit vector)
         A = self.Xball[1]-self.Xball[0]
         B = self.Yball[1]-self.Yball[0]
-        longeur = (math.fabs(A)+math.fabs(B))
+        longeur = (math.fabs(A)+math.fabs(B)) # the purpose is two make a unit vector
         a_before = round(A/longeur, Trajectoire.NB_ROUND)
         b_before = round(B/longeur, Trajectoire.NB_ROUND)
         #print " a_before : " + str(a_before) + " b_before : " + str(b_before)
             
-        # création of the collided line
+        # création of the collided line (unit vector)
         senderPlusUn = nb_sender+1
         if nb_sender == self.nbJoueurs:
             senderPlusUn = 1
@@ -207,9 +211,9 @@ class Trajectoire :
                 b_intersect_line = round(B/longeur, Trajectoire.NB_ROUND)
                 # determination of the intersection point
                 # the use of "len(self.Yball)-1" will allow us to build more complexe ball's beavior in futur developpement 
-                # traitement des exeptions du au modele math utilisé: prendre un feuille de papier pour comprendre. 
-                #  Les autres modèles que j'ai essayé sont pire.
-                #  Mais j'ai peu être loupé la solution la plus simple essite pas si une idée vous passe par la tête.
+                # Le IF ELSE qui suis est là pour faire le traitement des exeptions du au modele math utilisé: 
+                #   prendre un feuille de papier pour comprendre (divide by 0) => Les autres modèles que j'ai essayé sont pire.
+                #   Mais j'ai peu être loupé la solution la plus simple essitez pas si une idée vous passe par la tête.
                 if (a_after == 0.00):
                     Xintersect = self.Xball[len(self.Xball)-1]
                     if b_intersect_line == 0.00:
@@ -251,7 +255,7 @@ class Trajectoire :
         a_before = round(A/longeur, Trajectoire.NB_ROUND)
         b_before = round(B/longeur, Trajectoire.NB_ROUND)
             
-        # création of the collided line
+        # création of the collided line corresponding to the virtual wall
         a_border = 0.5
         b_border = 0.5
             
