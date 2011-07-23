@@ -4,13 +4,14 @@ import random, math
 import json
 
 from twisted.internet import reactor, defer
-""" Méthode de calcul de trajectoire, doit implémenter une méthode pour
-transformer la trajectoire en string JSON """
+
 
 import Jeu
 import time
 
 class Trajectoire :
+    """ Méthode de calcul de trajectoire, doit implémenter une méthode pour
+        transformer la trajectoire en string JSON """
     
     TAILLE_RAQ = 20 #taille de la raquette entre 0 et 100 (en pourcentage)
     TIME_INT = 0.020 #vitesse (sans unité particulière) de la balle

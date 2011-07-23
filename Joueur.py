@@ -11,53 +11,68 @@ import time
 import random
 
 class Joueur(WebSocketHandler):
-    TIMEOUT = 1000000 #durée maximum de présence sans mouvement
+    """
+    There exists one Joueur object per player, useful to save the pseudo, the score etc... his WebSocketHandler object
+    (used to communicate with him.
+    This class is used to handle the incoming and sent JSON messages specified in the protocol.
+    """
+
+    TIMEOUT = 1000000 #max time length a player can stay without moving
     
     
     def __init__(self, transport):
-        #= True si joueur banni
-        self.ban = False
-        if transport.getPeer().host.find('SOME IP HERE') != -1:
-            self.ban = True
-            transport.loseConnection()
         WebSocketHandler.__init__(self, transport)
-        #score du joueur
+        #timestamp, in ms, of the last time one has heard about this client, used to detect timeouts
+        self.lastTimeSeen = 0
+        #initialize it
+        self.setAlive()
+        #player's score
         self.score = 0
-        #pseudo du joueur
+        #player's pseudo
         self.name = ""
-        #décalage de temps, en ms, entre heure du serveur et heure du client
+        #time offset, in milliseconds, between server time and client time
         self.offset = 0
-        #position (du centre) de la raquette sur son axe, entre 0 et 100
+        #position of the center of the racket on its axis between 0 and 100
         self.raquette = 50
         self.oldRaquette = 50
         
         self.lastBouge = time.time()
         
-        
-    def __del__(self):
-        #print 'Deleting handler'
-        pass
-        
     def reset(self):
+        """
+        Reset player's score.
+        """
         self.score = 0
 
     def sendAll(self, msg):
-		for client in self.jeu.getJoueurs():
-			client.send(msg)
+        """
+        Send a JSON message to all players in this room.
+        """
+        for client in self.jeu.getJoueurs():
+            client.send(msg)
 
     def send(self, msgJSON):
+        """
+        Send a JSON message to this client.
+        """
         self.transport.write(json.dumps(msgJSON))
 
     def calcOffset(self, hour):
-        #OFFSET = REMOTE - LOCAL  ! en millisecondes
-        #OFFSET négatif => client en retard sur le serveur, indique aussi la valeur du lag
-        return - (time.time()*1000 - hour)
+        #OFFSET = REMOTE - LOCAL  ! in milliseconds
+        #the offset can come from 2 factors : the lag and the timezone difference between client and server
+        return (hour - time.time()*1000)
     
     def getHourClient(self):
+        """
+        Compute the present time as it must be in the client's computer considering the offset.
+        Returns a timestamp in ms !
+        """
         return (self.offset +  time.time()*1000)
 
     def isAlive(self):
-        for client in self.jeu.getJoueurs():
+        #TODO : to be rewritten it should be better that the game itself call this method but only for one client,
+        #here there is multiple calls
+        for client in self.jeu.getJoueurs(): 
 			#si on n'a pas entendu parler du client depuis plus de TIMEOUT secondes
 			if ((time.time()*1000 - client.lastTimeSeen) > (self.TIMEOUT*1000)):
 				print "%s is offline (timeout) !" % client.name
@@ -67,21 +82,34 @@ class Joueur(WebSocketHandler):
                 
 
     def setAlive(self):
+        """
+        When we receive something from the client, we remember the timestamp.
+        This is used to check, periodically, if he's still there.
+        """
         self.lastTimeSeen = time.time()*1000
 
 
     def perdre(self):
+        """
+        The player lost a ball, score = score - 1
+        """
         if self.score > 0:
             self.score -= 1
-        self.msgCollision(False)
-        self.msgGstat()
+        self.msgCollision(False) #tell the player he failed
+        self.msgGstat() #tells everyone the new score
         
     def gagner(self):
+        """
+        The player won a point, because the other player lost.
+        """
         self.score +=1
-        
+        #TODO : as in "perdre" we should send a msgCollision and a Gstat, shouldn't we ?
         
 
     def msgCollision(self, hit):
+        """
+        Tells every players that the last collision with a racket was a success, or a fail.
+        """
         msg = {}
         msg["msg"] = "Collision"
         if hit:
@@ -94,6 +122,7 @@ class Joueur(WebSocketHandler):
     def msgHello(self, msg):
         #TODO il est interdit de faire un Hello une deuxième fois quand le joueur est déjà connecté : à détecter !
         newPseudo = False
+        #if an empty pseudo is used, we assign the player a random one
         if msg["pseudo"] == "":
             newPseudo = True
             self.name = random.choice(["DSK","SofiMAIDS", "TieCops", \
@@ -101,48 +130,58 @@ class Joueur(WebSocketHandler):
                                        "G. Berger", "J. Capelle", "A.Einstein", \
                                        "C3ndrill0n", "Gr1nch3ux", "W4ll-F"])
         else:
+            #one truncates pseudos longer than 10 chars
             if len(msg["pseudo"]) >= 10:
                 self.name = msg["pseudo"][0:9]
                 newPseudo = True
             else:
                 self.name = msg["pseudo"]
         if self.jeu.nbJoueurs() == 2:
-            while (self.name == self.jeu.joueurs[self.axe^1].name):
+            #if there is 2 players, one adds digits to the pseudo until it is different from the other
+            if (self.name == self.jeu.joueurs[self.axe^1].name):
                 newPseudo = True
                 self.name += str(random.randint(1, 9))
         if newPseudo:
-            self.msgNewPseudo(self.name)
+            self.msgNewPseudo(self.name) #if we picked a different pseudo than what the player choosed, one tells him
+        #updates the time offset    
         self.offset = self.calcOffset(msg["time"])
-        #quand un client se connecte, on le dit à tout le monde
+        #when a player is connecting, one informs everyone
         self.msgGstat()
-        #quand un client se connecte, le serveur lui envoie un SyncJ pour qu'il connaisse les raquettes des autres
+        #and one sends SyncJ to the player in order for him to know others' players' rackets
         self.msgSyncJ()
         
     def msgNewPseudo(self,pseudo):
+        """
+        Informs the player that he has been given a different pseudo than what he choosed.
+        """
         msg = {}
         msg["msg"] = "newPseudo"
         msg["pseudo"] = pseudo
         self.send(msg)
-        #print "Msg newPseudo" + json.dumps(msg)
 
     def msgBouge(self, msg):
+        """
+        The player moved his racket to a new position.
+        """
         #TODO déclencher erreur si n'est pas compris entre 0 et 100 : hack !
         self.oldRaquette = self.raquette
         self.raquette = msg["raquette"]
         self.offset = self.calcOffset(msg["time"])
 
     def msgSyncJ(self):
+        """
+        Sends to every player the position of every racket.
+        """
         msg = {}
         msg["msg"] = "SyncJ"
         msg["raquettes"] = {}
         for client in self.jeu.getJoueurs():
             msg["raquettes"][client.name] = client.raquette
-        for client in self.jeu.getJoueurs():
-            client.send(msg)
+        client.sendAll(msg)
         
-        #print "SyncJ envoyé : " + json.dumps(msg)
         
     def msgSyncJBouge(self):
+        #TODO : not found in the protocol, please COMMENT
         msg = {}
         msg["msg"] = "SyncJ"
         msg["raquettes"] = {}
@@ -151,13 +190,13 @@ class Joueur(WebSocketHandler):
             if client != self:
                 client.send(msg)
         
-        #print "SyncJ envoyé : " + json.dumps(msg)
 
     def msgGstat(self):
-        """ Envoi aux clients les informations sur tous les clients.
-        
-        Les informations de chaque joueur sont son pseudo et son score"""
-        
+        """
+        Sends to every client the informations about everyone.
+       
+        Each player's informations are : pseudo, axis and score.
+        """
         msg = {}
         msg["msg"] = "GStat"
         msg["players"] = {}
@@ -166,9 +205,11 @@ class Joueur(WebSocketHandler):
             msg["players"][client.name]["points"] = client.score
             msg["players"][client.name]["axe"] = client.axe
         self.sendAll(msg)
-        #print "Gstat envoyé : " + json.dumps(msg)
             
     def decode(self, msg):
+        """
+        Incoming message, it could be a Hello or Bouge message.
+        """
         #print "Message reçu : \n%s" % json.dumps(msg, indent = 2)
         if (msg["msg"] == "Hello"):
             self.msgHello(msg)
@@ -176,26 +217,23 @@ class Joueur(WebSocketHandler):
             self.msgBouge(msg)
             self.lastBouge = time.time()
             if self.jeu.nbJoueurs() == 2:
-                self.msgSyncJBouge()
+                self.msgSyncJBouge() #TODO : please COMMENT, it is undocumented in the protocol !
         else:
             print "Message inconnu !"
 
         self.setAlive()
-        #print "Attributs de self : %s" % vars(self)
             
 
     def frameReceived(self, frame):
+        #Called by the websocket library when a new frame is received.
         self.decode(json.loads(frame))
         
        
     def connectionMade(self):
-
+        #Called by the websocket library when the connection with the client has been established.
         #print 'Connected to client.'
         self.site.ajouterJoueurDansJeu(self)
-        #heure, en ms, à laquelle on a entendu parler de ce client pour la dernière fois, utilisé pour détecter les timeouts
-        self.lastTimeSeen = 0
-        #on intialise cette valeur
-        self.setAlive()
+        #TODO : refactor it, there should be one pingLoop by room and not one by player object
         #on va créer une boucle pour tester si le joueur est alive, avant on regarde si on n'a pas déjà créé cette boucle
         #en fait on la crée une seule fois, quand le premier client se connecte
         if (not hasattr(self.jeu, "pingLoop")):
@@ -206,6 +244,6 @@ class Joueur(WebSocketHandler):
         
 
     def connectionLost(self, reason):
-        #print 'Lost connection.'
-        if not self.ban:
-            self.jeu.enleverJoueur(self)
+        #Called by the websocket library, the connection has been lost
+        self.jeu.enleverJoueur(self)
+
