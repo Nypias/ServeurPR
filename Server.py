@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from Jeu import JeuFactory
-from Joueur import Joueur
+from RoomFactory import RoomFactory
+from Player import Player
 from twisted.web.static import File
 from twisted.web.resource import Resource
 from websocket import *
@@ -81,8 +81,8 @@ if __name__ == "__main__":
     from twisted.internet import reactor
 
     root = File("../ClientPR/") #root of the webserver
-    factory = JeuFactory(root) #factory handles websocket requests
-    factory.addHandler('/game', Joueur)
+    factory = RoomFactory(root) #factory handles websocket requests
+    factory.addHandler('/game', Player)
     root.putChild("gamePage", GamePage())
     root.putChild("stats", StatsPage(factory))
     reactor.listenTCP(8080, factory)
